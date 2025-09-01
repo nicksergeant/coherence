@@ -111,6 +111,9 @@ Coherence/
 - **Procedural generation**: Each universe is unique
 
 ## Important References
+- **IMPORTANT**: Always check Bevy version (currently 0.16.1) and use latest API
+- **Bevy Official Docs**: https://docs.rs/bevy/latest/bevy/
+- **Bevy Examples**: https://github.com/bevyengine/bevy/tree/main/examples
 - **Bevy Book**: https://bevyengine.org/learn/book/introduction/
 - **Unofficial Bevy Cheat Book**: Essential resource for Bevy patterns
 - **Example projects to study**:
