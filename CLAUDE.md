@@ -86,10 +86,11 @@ Coherence/
 ### Learning Project Principles
 1. **Small, atomic changes**: Each change should be 10-50 lines when learning new concepts
 2. **Explain everything**: Every macro (!), trait, ownership concept, etc.
-3. **Document first**: Update docs before implementation
-4. **One concept at a time**: Never combine multiple new Rust/Bevy concepts
-5. **Working code at every step**: No big bang integrations
-6. **Teaching moments**: Every step is an opportunity to learn Rust fundamentals
+3. **NO COMMENTS in code**: Never add code comments unless something is genuinely unusual or complex that requires inline documentation
+4. **Document first**: Update docs before implementation
+5. **One concept at a time**: Never combine multiple new Rust/Bevy concepts
+6. **Working code at every step**: No big bang integrations
+7. **Teaching moments**: Every step is an opportunity to learn Rust fundamentals
 
 ### Current Development Phase
 **Phase 0: Environment Setup** (Current)
