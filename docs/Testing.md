@@ -1,4 +1,4 @@
-# Testing Strategy for Coherence
+# Testing Strategy
 
 ## Core Philosophy
 

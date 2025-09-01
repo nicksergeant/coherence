@@ -1,4 +1,8 @@
-# Coherence - Game Design Document
+# Game Design
+
+## Overview
+
+A top-down pixel art game inspired by "Dark Matter" where players travel between parallel universes. Each universe is procedurally generated using a chunk-based system, creating infinite unique worlds to explore.
 
 ## Core Concept
 A top-down pixel art game inspired by the novel "Dark Matter" where players travel between parallel universes. Each universe is procedurally generated using a chunk-based system, creating infinite unique worlds to explore.

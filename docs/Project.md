@@ -1,4 +1,8 @@
-# Coherence - Project Guidelines
+# Project Guidelines
+
+## Overview
+
+Guidelines for contributing to Coherence as a learning-focused game development project. These principles ensure code remains educational and reviewable.
 
 ## LLM Interaction Instructions
 

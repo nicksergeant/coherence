@@ -1,4 +1,4 @@
-# Coherence - Art Pipeline
+# Art Pipeline
 
 ## Overview
 

@@ -1,6 +1,8 @@
-# Coherence - Technical Stack & Resources
+# Technical Architecture
 
-## Core Technology Decision: Rust + Bevy
+## Overview
+
+Core technology stack: **Rust + Bevy** for learning-focused game development.
 
 ### Why Bevy/Rust
 - **ECS Architecture**: Perfect for managing different universe systems and rules
@@ -18,13 +20,13 @@
   - `cargo-watch`: Hot reload during development
 - **Build times**: Initial builds 30-60s (use cargo-watch for iteration)
 
-## Rust Learning Challenges (from TypeScript)
+## Rust Learning Challenges
 1. **Ownership/Borrowing**: Can't freely pass references around
 2. **No null/undefined**: Explicit `Option<T>` and `Result<T,E>`
 3. **Upfront edge case handling**: Less "make it work" flexibility
 4. **Compile times**: Longer than JS/TS development
 
-## Rust Benefits for TS Developers
+## Rust Benefits
 - Pattern matching (similar to Elixir)
 - Zero-cost abstractions
 - Compiler-driven development
@@ -181,7 +183,7 @@ let texture_handle = asset_server.load("sprites/characters/player/idle.png");
    make assets && make run
    ```
 
-## Alternative Tech Stacks (Considered but Rejected)
+## Alternatives Considered
 
 ### Love2D + Lua
 - ✅ Fast iteration, simple API
@@ -197,7 +199,7 @@ let texture_handle = asset_server.load("sprites/characters/player/idle.png");
 - ✅ Functional programming paradigms
 - ❌ Want native binary, not browser game
 
-## Learning Resources Needed
+## Learning Resources
 
 ### Rust Basics
 - The Rust Book (official documentation)
@@ -213,7 +215,7 @@ let texture_handle = asset_server.load("sprites/characters/player/idle.png");
 - Understanding Entity-Component-System architecture
 - Bevy's specific implementation
 
-## Project Setup Steps
+## Getting Started
 1. Install Rust toolchain (rustup)
 2. Set up Neovim with rust-analyzer
 3. Create new Bevy project
@@ -227,7 +229,7 @@ let texture_handle = asset_server.load("sprites/characters/player/idle.png");
 - Consider chunk-based loading for large universes
 - Profile early and often with cargo flamegraph
 
-## Open Technical Questions
+## Technical Questions
 - Asset pipeline: How to manage and load pixel art efficiently?
 - Save system: How to serialize universe states?
 - Procedural generation: Use Wave Function Collapse for universe generation?
