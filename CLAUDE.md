@@ -267,3 +267,36 @@ player.x, player.y = actualX, actualY
 5. Load a Tiled map with STI
 6. Implement chunk system
 7. Add universe jumping mechanic
+
+## Documentation Sync Commands
+
+### After Major Changes
+Run this command to keep docs in sync:
+```
+"Review all files in docs/ (Game.md, Tech.md, Project.md, Testing.md, Tasks.md, Examples.md) 
+and compare with current code implementation. Propose updates to keep documentation 
+synchronized with the actual code. Check that Tasks.md reflects completed work."
+```
+
+### After Design Changes
+```
+"The game design has changed: [describe change]. Update Game.md to reflect this, 
+then check Tasks.md and Examples.md for any needed updates. Ensure constants.lua 
+includes any new constants needed."
+```
+
+### Daily Sync Check
+```
+"Check Tasks.md for current task. Implement the next uncompleted task. 
+After implementation, test it, mark it complete, and update Current Focus section."
+```
+
+## Important Reminders
+
+1. **NEVER modify Tiled map files** (.lua exports from Tiled)
+2. **ALWAYS use constants.lua** for magic numbers
+3. **ALWAYS add logging** for state changes
+4. **IMMEDIATELY test** after implementing features
+5. **Check Tasks.md** before starting new work
+6. **Update Tasks.md** after completing work
+7. **Reference Examples.md** for implementation patterns

@@ -334,6 +334,45 @@ end
 - **Write automated tests for**: Math functions, algorithms
 - **Create test states for**: Isolated feature development
 
+## LLM Development Workflow
+
+### The Right Way
+1. **Ask LLM to implement ONE feature**
+2. **IMMEDIATELY run the game** (don't accumulate changes)
+3. **Play the feature yourself**
+4. **Check the console for logs**
+5. **Report issues WITH the log output**
+6. **Ask for more logging if behavior is unclear**
+7. **Only mark task complete after it works**
+
+### Common LLM Issues and Fixes
+
+**Issue:** LLM doesn't understand what's happening
+**Fix:** Ask it to add logging to that specific feature
+
+**Issue:** Feature works differently than expected
+**Fix:** Share gameplay logs so LLM sees actual behavior
+
+**Issue:** LLM makes changes to Tiled map files
+**Fix:** STOP! Revert changes, edit maps only in Tiled
+
+**Issue:** Constants hardcoded everywhere
+**Fix:** Remind LLM to use constants.lua
+
+**Issue:** No logging of state changes
+**Fix:** Ask LLM to add print() statements with [CATEGORY] prefix
+
+### Testing Checklist for LLM
+```markdown
+- [ ] Feature implemented
+- [ ] Game runs without errors
+- [ ] Logging added for state changes
+- [ ] Constants in constants.lua
+- [ ] Tested interactively
+- [ ] Debug mode shows useful info
+- [ ] Task marked complete in Tasks.md
+```
+
 ## Running Tests
 
 ```bash

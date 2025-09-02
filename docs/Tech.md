@@ -41,21 +41,27 @@ Single repository with separate directories for each component:
 ```
 Coherence/
 ├── game/                      # Love2D game
-│   ├── main.lua              # Entry point with love callbacks
-│   ├── conf.lua              # Love2D configuration
+│   ├── main.lua              # ONLY Love2D callbacks (load, update, draw)
+│   ├── conf.lua              # Love2D configuration ONLY
+│   ├── constants.lua         # ALL game constants in one place
 │   ├── states/               # Game states (menu, play, etc)
 │   │   ├── menu.lua
 │   │   ├── play.lua
 │   │   └── lab.lua
-│   ├── lib/                  # Third-party libraries
+│   ├── lib/                  # Third-party libraries (DO NOT MODIFY)
 │   │   ├── bump/            # Collision detection
 │   │   ├── sti/             # Simple Tiled Implementation
 │   │   ├── hump/            # Utilities (gamestate, camera)
 │   │   └── lurker/          # Hot reload
-│   ├── src/                  # Game source code
-│   │   ├── player.lua
-│   │   ├── world.lua
-│   │   └── universe.lua
+│   ├── logic/                # Game logic (separate from rendering)
+│   │   ├── player.lua       # Player movement and state
+│   │   ├── chunks.lua       # Chunk generation and management
+│   │   ├── universe.lua     # Universe generation rules
+│   │   └── collision.lua    # Collision handling
+│   ├── render/               # Rendering code only
+│   │   ├── sprites.lua      # Sprite drawing
+│   │   ├── tilemap.lua      # Tilemap rendering
+│   │   └── debug.lua        # Debug overlay rendering
 │   ├── assets/               # Game assets
 │   │   ├── sprites/
 │   │   │   ├── characters/
@@ -65,8 +71,9 @@ Coherence/
 │   │   │   │   └── tileset.png (256x256)
 │   │   │   └── ui/
 │   │   │       └── icons.png
-│   │   ├── maps/            # Tiled map files
+│   │   ├── maps/            # Tiled map files (NEVER modify programmatically!)
 │   │   │   ├── lab.lua      # Exported from Tiled
+│   │   │   ├── lab.json     # Tiled project file
 │   │   │   └── chunks/      # Procedural chunk templates
 │   │   └── fonts/
 │   └── README.md
@@ -218,27 +225,60 @@ lurker.postswap = function(f) print("Reloaded " .. f) end
 ### Game Structure
 
 ```lua
--- main.lua
+-- main.lua (ONLY callbacks, no game logic!)
+local constants = require "constants"
+local gameLogic = require "logic.game"
+local renderer = require "render.renderer"
+
 function love.load()
-    -- Initialize game
+    gameLogic.init()
+    print("[INIT] Game started")
 end
 
 function love.update(dt)
-    -- Update logic
+    gameLogic.update(dt)
 end
 
 function love.draw()
-    -- Render game
+    renderer.draw()
 end
 ```
 
 ```lua
--- conf.lua
+-- conf.lua (Configuration ONLY)
 function love.conf(t)
     t.window.title = "Coherence"
     t.window.width = 1024
     t.window.height = 768
+    t.window.vsync = true
+    t.console = true  -- Show console on Windows
 end
+```
+
+```lua
+-- constants.lua (ALL constants here!)
+return {
+    -- Window
+    WINDOW_WIDTH = 1024,
+    WINDOW_HEIGHT = 768,
+    
+    -- Player
+    PLAYER_SPEED = 200,
+    PLAYER_SIZE = 32,
+    
+    -- World
+    CHUNK_SIZE = 10,
+    TILE_SIZE = 32,
+    WORLD_SIZE = 5,  -- 5x5 chunks
+    
+    -- Universe thresholds
+    UTOPIA_THRESHOLD = 0.7,
+    DYSTOPIA_THRESHOLD = 0.3,
+    
+    -- Debug
+    DEBUG_KEY = "f1",
+    LOG_LEVEL = "INFO"  -- "DEBUG", "INFO", "WARN", "ERROR"
+}
 ```
 
 ## Learning Resources
@@ -266,9 +306,11 @@ end
 ```bash
 # macOS
 brew install love
+brew cask install tiled  # Map editor
 
 # Linux
 sudo apt install love
+sudo apt install tiled
 
 # Verify installation
 love --version
@@ -281,6 +323,54 @@ love --version
 4. Add conf.lua for window settings
 5. Install libraries (bump, STI, hump)
 6. Set up hot reload with lurker
+
+## Tiled Map Editor Integration
+
+### Creating Maps in Tiled
+1. **New Map Settings:**
+   - Orientation: Orthogonal
+   - Tile size: 32x32 pixels
+   - Map size: 10x10 tiles (for chunks)
+   - Use CSV encoding (not compressed)
+
+2. **Export Settings:**
+   - Format: Lua (.lua)
+   - DO NOT use compression
+   - Save to `game/assets/maps/`
+
+3. **Layer Setup:**
+   - "ground" layer - walkable tiles
+   - "collision" layer - walls and obstacles
+   - "objects" layer - interactive elements
+
+4. **Custom Properties:**
+   - Add "collidable" bool property to tiles
+   - Add "type" string property for universe types
+
+### Loading Maps with STI
+```lua
+local sti = require "lib.sti"
+local map
+
+function love.load()
+    -- Load Tiled map
+    map = sti("assets/maps/lab.lua")
+    print("[MAP] Loaded: lab.lua")
+end
+
+function love.update(dt)
+    map:update(dt)
+end
+
+function love.draw()
+    map:draw()
+end
+```
+
+### IMPORTANT: Never Let LLM Modify Map Files
+- Tiled exports are DATA files, not code
+- Always edit maps in Tiled, not in code
+- If LLM tries to modify .lua map files, STOP IT
 
 ## Performance Considerations
 - Use sprite batches for tiles

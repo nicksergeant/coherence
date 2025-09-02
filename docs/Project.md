@@ -88,7 +88,7 @@ When errors occur:
 ### 8. Asset Creation Strategy
 Start with:
 - Colored rectangles (no art needed)
-- Simple geometric shapes
+- Simple geometric shapes  
 - Text labels
 
 Then gradually:
@@ -96,12 +96,44 @@ Then gradually:
 - Create simple Aseprite sprites
 - Generate AI art only when core game works
 
-### 9. Progress Tracking
+### 9. Logging Strategy
+**Always log state changes:**
+```lua
+print("[PLAYER] Moved to chunk 2,3")
+print("[UNIVERSE] Generated dystopia")
+print("[STATE] Switched from menu to game")
+print("[CHUNK] Loaded chunk at 5,5")
+print("[ERROR] Failed to load asset")
+```
+
+**If LLM can't understand an issue:**
+- Ask it to add more logging to that specific area
+- Run game and share the logs
+- Logs help LLM understand what's actually happening
+
+### 10. Progress Tracking
 After each session, note:
 - What was learned
 - What works now that didn't before
 - Next logical step
 - Any confusion points to revisit
+
+### 11. Reality Checks
+
+**Planned:** Separate logic and rendering
+**Reality:** LLMs struggle with this separation. Start with everything in main.lua, refactor later.
+
+**Planned:** Use metatables for OOP
+**Reality:** Too complex initially. Use simple tables first.
+
+**Planned:** Automated tests from start
+**Reality:** Interactive testing is faster for Love2D. Add automated tests after core works.
+
+**Planned:** Complex state management
+**Reality:** Start with simple if/then states. Add HUMP gamestate when needed.
+
+**Planned:** Perfect code structure
+**Reality:** Working code > clean code initially. Refactor after features work.
 
 ## Communication Style
 

@@ -24,6 +24,39 @@ A top-down pixel art game inspired by the novel "Dark Matter" where players trav
   - **Resonance**: Affects how far the box spawns from your starting point
 - Jump button to initiate universe travel
 
+**Example Lab State:**
+```lua
+local labState = {
+    stability = 0.5,   -- Range: 0.0 to 1.0
+    coherence = 0.5,   -- Range: 0.0 to 1.0
+    resonance = 0.5,   -- Range: 0.0 to 1.0
+}
+
+function generateUniverse(lab)
+    local universe = {}
+    
+    -- Determine type based on stability
+    if lab.stability > 0.7 then
+        universe.type = "utopia"
+    elseif lab.stability < 0.3 then
+        universe.type = "dystopia"
+    else
+        universe.type = "neutral"
+    end
+    
+    -- Box distance based on resonance
+    universe.boxDistance = math.floor(lab.resonance * 5) + 1  -- 1-5 chunks away
+    
+    -- Chaos level based on coherence
+    universe.chaosFactor = 1.0 - lab.coherence
+    
+    print(string.format("[LAB] Jumping to %s (box %d chunks away)", 
+        universe.type, universe.boxDistance))
+    
+    return universe
+end
+```
+
 ### 2. Universe Exploration
 - Land in a procedurally generated outdoor world (Stardew-style overworld)
 - Explore the map, enter buildings, discover the environment
@@ -76,6 +109,29 @@ A top-down pixel art game inspired by the novel "Dark Matter" where players trav
 - Start chunk (player always spawns here)
 - Box chunk (contains the quantum box for return)
 - Building chunks (contain explorable interiors)
+
+### Example Chunk Definition
+```lua
+-- Dystopia toxic waste chunk
+local toxicChunk = {
+    type = "toxic_waste",
+    universe = "dystopia",
+    tiles = {
+        {1,1,1,2,2,2,1,1,1,1},  -- 1=toxic, 2=waste
+        {1,3,3,2,2,2,3,3,1,1},  -- 3=debris
+        {1,3,0,0,0,0,0,3,1,1},  -- 0=walkable
+        {2,2,0,4,4,4,0,2,2,2},  -- 4=hazard
+        {2,2,0,4,5,4,0,2,2,2},  -- 5=container
+        {2,2,0,4,4,4,0,2,2,2},
+        {1,3,0,0,0,0,0,3,1,1},
+        {1,3,3,2,2,2,3,3,1,1},
+        {1,1,1,2,2,2,1,1,1,1},
+        {1,1,1,1,1,1,1,1,1,1}
+    },
+    hazards = {{x=4,y=5,damage=10}},
+    spawnWeight = 0.3  -- 30% chance in dystopia
+}
+```
 
 ### Generation Rules
 - Universe type determines chunk distribution percentages
