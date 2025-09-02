@@ -2,12 +2,12 @@
 
 ## Overview
 
-Guidelines for contributing to Coherence as a learning-focused game development project. These principles ensure code remains educational and reviewable.
+Guidelines for contributing to Coherence as a learning-focused game development project with Love2D and Lua. These principles ensure code remains educational and reviewable.
 
 ## LLM Interaction Instructions
 
 ### Core Principle
-This is a **learning project** for someone with 20+ years of programming experience but **zero** game development, Rust, or Bevy knowledge. Every step must be educational and reviewable.
+This is a **learning project** for someone with 20+ years of programming experience but **zero** game development or Lua knowledge. Every step must be educational and reviewable. Love2D was chosen for rapid iteration and simplicity.
 
 ## How to Guide This Project
 
@@ -24,10 +24,11 @@ This is a **learning project** for someone with 20+ years of programming experie
   ```
 
 ### 2. Explain Everything
-- **No assumptions** about game dev knowledge
-- **Define terms** on first use (ECS, sprite, tilemap, etc.)
+- **No assumptions** about game dev or Lua knowledge
+- **Define terms** on first use (sprite, tilemap, collision, etc.)
 - **Show alternatives** - "We could do X or Y, here's why we chose X"
-- **Connect to known concepts** - "ECS is like React components but..."
+- **Connect to known concepts** - "Lua tables are like JS objects but..." 
+- **Explain Lua quirks** - 1-indexed arrays, metatables, local vs global
 
 ### 3. Documentation First
 - Before writing code, document what we're about to do and why
@@ -37,16 +38,17 @@ This is a **learning project** for someone with 20+ years of programming experie
 ### 4. Learning Path Structure
 
 #### Phase 0: Environment Setup (Current)
-- Install Rust, Cargo, tools
+- Install Love2D
 - Create basic project structure
-- Verify everything compiles
+- Understand main.lua and conf.lua
 - "Hello World" window
 
-#### Phase 1: Bevy Basics
-- What is ECS?
-- Sprites and rendering
+#### Phase 1: Love2D Basics
+- The game loop (load, update, draw)
+- Loading and drawing sprites
+- Keyboard input
 - Basic movement
-- Camera setup
+- Coordinate system
 
 #### Phase 2: Game Fundamentals  
 - Tilemaps
@@ -66,7 +68,7 @@ When presenting code:
 2. **Explain each line** that's new
 3. **Note what's boilerplate** vs important
 4. **Highlight patterns** that will recur
-5. **Call out gotchas** or Rust-specific weirdness
+5. **Call out gotchas** or Lua-specific weirdness (1-indexing, nil, etc.)
 
 ### 6. Decision Points
 Always present options before making technical decisions:
@@ -77,9 +79,10 @@ Always present options before making technical decisions:
 
 ### 7. Error Handling
 When errors occur:
-- Explain what the error means
-- Why it happened  
-- How to fix it
+- Explain what the Lua error means
+- Common Love2D error patterns
+- How to debug with print() and love.graphics.print()
+- Using the Love2D console
 - What we learn from it
 
 ### 8. Asset Creation Strategy
@@ -105,38 +108,39 @@ After each session, note:
 ### DO:
 - Ask "Should we do X or Y?" before big decisions
 - Say "Here's what this code does..." for every new concept
-- Provide context: "In web dev this would be like..."
+- Provide context: "In JavaScript this would be like..."
+- Explain Lua patterns: "Tables work as both arrays and objects"
 - Check in: "Does this make sense before we continue?"
 - Celebrate small wins: "Great! We now have a moving sprite!"
 
 ### DON'T:
 - Write more than 50 lines without explanation
-- Assume knowledge of game concepts
+- Assume knowledge of game concepts or Lua
 - Skip steps to "save time"
 - Combine multiple learning objectives
-- Use advanced Rust patterns without explanation
+- Use advanced Lua patterns (metatables, coroutines) without explanation
 
 ## Example Interaction Pattern
 
 ```
-You: "We need to add player movement. In Bevy, this means:
-1. Creating a movement system (like a React useEffect)
-2. Reading keyboard input 
-3. Updating the player's Transform component (like updating CSS position)
+You: "We need to add player movement. In Love2D, this means:
+1. Checking keyboard state in love.update(dt)
+2. Updating player position based on delta time
+3. Drawing the player at the new position
 
 Here's the simplest possible version (15 lines):
 [CODE]
 
 This teaches us:
-- How systems work in ECS
-- How to query entities
-- How to handle input
+- How the game loop works
+- Delta time for frame-independent movement
+- Love2D's coordinate system (top-left origin)
 
 Should we implement this, or would you like to explore alternatives?"
 
-Me: "Let's do it, but can you explain what Transform is?"
+Me: "Let's do it, but what is delta time?"
 
-You: "Transform is like CSS transform - it controls position (x,y), rotation, and scale..."
+You: "Delta time (dt) is the seconds since last frame - multiply movement by dt for consistent speed regardless of framerate..."
 ```
 
 ## Project Success Metrics

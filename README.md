@@ -1,6 +1,6 @@
 # Coherence
 
-**🎓 A learning project**: Building a game to learn Rust, Bevy, and game development fundamentals.
+**🎓 A learning project**: Building a game to learn Lua, Love2D, and game development fundamentals.
 
 ## The Game Concept
 
@@ -13,33 +13,36 @@ In Coherence, you control the chaos. Adjust your quantum device's parameters—S
 This project exists primarily to learn:
 
 ### What I'm Learning
-- **Rust** - Coming from TypeScript, learning ownership, borrowing, and systems programming
-- **Bevy** - Understanding Entity Component System (ECS) architecture
+- **Lua** - Simple, powerful scripting language (also useful for Neovim config)
+- **Love2D** - 2D game framework with immediate mode rendering and hot reload
 - **Game Development** - First game project, learning core concepts like game loops, collision, rendering
 - **Procedural Generation** - Chunk-based world generation algorithms
 - **AI Art Workflows** - Building automated pipelines for asset creation
 
 ### Current Progress
 
-🚧 **Early Development** - Building foundational systems
+🚧 **Early Development** - Setting up Love2D foundation
 
 - ✅ Project structure and documentation
-- ✅ Basic Bevy window rendering
-- ✅ Testing strategy defined
-- 🚧 Player movement implementation
-- ⏳ Sprite rendering and collision
+- ⏳ Basic Love2D window and game loop
+- ⏳ Player movement with keyboard input
+- ⏳ Tilemap rendering with STI (Simple Tiled Implementation)
+- ⏳ Collision detection with Bump
+- ⏳ Game state management with HUMP
 - ⏳ Universe transition system
 - ⏳ Procedural world generation
 - ⏳ Art pipeline setup
 
 ## Tech Stack
 
-Chosen for maximum learning opportunity:
+Chosen for rapid iteration and learning:
 
-- **Game Engine**: Bevy (Rust) - Chose over Unity/Godot to learn Rust
-- **Language**: Rust - Challenging coming from TypeScript, but valuable
+- **Game Framework**: Love2D - Fast iteration, proven track record (Balatro)
+- **Language**: Lua - Simple, powerful, useful beyond gamedev (Neovim)
+- **Tilemap Editor**: Tiled - Industry standard, works great with STI
+- **Libraries**: Bump (collision), STI (tilemaps), HUMP (utilities)
 - **Art Pipeline**: AI-generated pixel art - Since I can't draw
-- **Testing**: Comprehensive test suite - Learning TDD in game context
+- **Distribution**: Love2D bundles to ~10-50MB native apps
 
 ## Documentation
 
@@ -58,22 +61,27 @@ Extensive documentation as part of the learning process:
 git clone https://github.com/yourusername/coherence.git
 cd coherence
 
-# Run the game (currently just a window with a white square)
-cd game
-cargo run
+# Install Love2D (macOS)
+brew install love
 
-# Run tests
-cargo test
+# Run the game
+love game/
 
-# Watch mode for development
-cargo watch -x run
+# Or run with hot reload (if using a file watcher)
+# Example with entr:
+ls game/*.lua | entr -r love game/
 ```
 
 ## Project Structure
 
 ```
 Coherence/
-├── game/       # Rust/Bevy game code
+├── game/       # Love2D game code
+│   ├── main.lua
+│   ├── conf.lua
+│   ├── states/
+│   ├── lib/    # Third-party libraries (Bump, STI, HUMP)
+│   └── assets/
 ├── art/        # AI art generation pipeline (not yet implemented)
 ├── docs/       # Extensive documentation
 └── scripts/    # Build and utility scripts (planned)
@@ -95,18 +103,20 @@ This is a personal learning project, but if you're also learning:
 
 ## Why This Stack?
 
-- **Why Rust over easier options?** Maximum learning, transferable skills
-- **Why Bevy over Godot?** To learn ECS patterns and Rust together
+- **Why Love2D over Godot/Unity?** Rapid iteration, simple distribution, learn Lua for Neovim
+- **Why Lua over other languages?** Simple to learn, useful for config files, proven for games
+- **Why not web-based?** Want native performance and simple binary distribution
 - **Why AI art?** Can't draw, but want custom assets
 - **Why so much documentation?** Writing helps understanding
 
 ## Current Focus
 
-Building player movement with full understanding of:
-- How Bevy's ECS works
-- How input systems connect to movement
-- How to test game mechanics
-- How transforms work in 2D space
+Setting up Love2D foundation with:
+- Basic game loop (love.load, love.update, love.draw)
+- Keyboard input handling
+- Simple sprite rendering
+- Understanding Lua tables and metatables
+- Game state management patterns
 
 ## License
 
@@ -114,4 +124,4 @@ MIT - See [LICENSE](LICENSE) file for details. Feel free to use any code for you
 
 ---
 
-*This is my first game and first Rust project. The code reflects a learning journey, not production best practices. That's intentional - this is about learning, not shipping.*
+*This is my first game and first Lua project. The code reflects a learning journey, not production best practices. That's intentional - this is about learning, not shipping.*

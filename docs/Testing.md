@@ -2,102 +2,99 @@
 
 ## Core Philosophy
 
-We test **game features**, not code structure. A test should answer: "Can the player do X?" not "Does system Y work?"
+We test **game features**, not code structure. A test should answer: "Can the player do X?" not "Does function Y work?"
 
-### The Neural Network Test
-Every test we write should still be valid if we replaced our entire ECS implementation with a magic AI that produces the right game state. This forces us to test observable behavior, not implementation.
+### Interactive Testing First
+Love2D games are best tested interactively. The fast iteration cycle means we can test by playing. Automated tests come second for regression prevention.
 
 ## Testing Principles
 
-### 1. Data-Driven Tests
-Tests are defined by input → expected output, not by code that exercises APIs.
+### 1. Debug Mode Features
+Build debugging tools directly into the game:
 
-```rust
-// Good: Data describes the test
-check_player_movement(
-    start_pos: Vec2::new(0.0, 0.0),
-    input: KeyCode::ArrowRight,
-    duration: 1.0,
-    expected_pos: Vec2::new(100.0, 0.0),
-);
+```lua
+-- Show collision boxes
+if DEBUG then
+    love.graphics.setColor(1, 0, 0, 0.5)
+    love.graphics.rectangle("line", player.x, player.y, player.w, player.h)
+end
 
-// Bad: Test knows about internals
-let mut velocity = Velocity::default();
-velocity.x = 100.0;
-assert_eq!(velocity.x, 100.0);
+-- Show FPS and stats
+if DEBUG then
+    love.graphics.print("FPS: " .. love.timer.getFPS(), 10, 10)
+    love.graphics.print("Chunks: " .. #activeChunks, 10, 30)
+end
 ```
 
-### 2. Test Features at the Boundary
-The boundary is what the player experiences, not internal APIs.
+### 2. Test Through Play
+The best test is playing the game. Focus on:
 
-**What we test:**
-- Player moves when arrow key pressed
-- Collision prevents movement through walls
-- Picking up items increases inventory
-- Universe transitions maintain player state
+**Manual Testing Checklist:**
+- Player moves smoothly with keyboard
+- Collision stops player at walls
+- Chunks load/unload properly
+- Universe transitions work
+- Performance stays above 60 FPS
 
-**What we DON'T test (usually):**
-- Individual ECS components
-- System execution order (unless critical)
-- Internal helper functions
-- Resource management
-
-### 3. Fast Tests by Default, Visual When Needed
-Tests run headless with MinimalPlugins by default. Add graphics when debugging:
-
-```rust
-fn test_app() -> App {
-    let mut app = App::new();
-    
-    if std::env::var("VISUAL_TEST").is_ok() {
-        app.add_plugins(DefaultPlugins);
-    } else {
-        app.add_plugins(MinimalPlugins);
-    }
-    
-    app
-}
+**Debug Commands:**
+```lua
+-- Add debug keys
+function love.keypressed(key)
+    if key == "f1" then DEBUG = not DEBUG end
+    if key == "f2" then showCollision = not showCollision end
+    if key == "f3" then teleportToBox() end
+    if key == "f4" then regenerateWorld() end
+end
 ```
 
-Run visual: `VISUAL_TEST=1 cargo test collision -- --nocapture`
+### 3. Automated Testing with Busted
+For critical logic, use Busted (Lua testing framework):
 
-## Test Patterns
-
-Choose the right pattern for your testing scenario:
-
-### Pattern 1: Simple Check Functions
-For basic invariants and simple mechanics.
-
-```rust
-#[track_caller]
-fn check_movement(start: Vec2, input: KeyCode, expected: Vec2) {
-    let mut app = test_app();
-    
-    app.world.spawn((
-        Player,
-        Transform::from_translation(start.extend(0.0))
-    ));
-    
-    app.world.resource_mut::<ButtonInput<KeyCode>>().press(input);
-    app.update();
-    
-    let player = app.world
-        .query_filtered::<&Transform, With<Player>>()
-        .single(&app.world);
-    
-    assert_eq!(player.translation.truncate(), expected);
-}
+```lua
+-- tests/player_spec.lua
+describe("Player", function()
+    it("should move right", function()
+        local player = require("src.player")
+        player.x = 0
+        player:move("right", 1.0) -- dt = 1 second
+        assert.are.equal(100, player.x)
+    end)
+end)
 ```
 
-### Pattern 2: Test Struct (for Complex Scenarios)
-For tests that benefit from being playable and have complex setup.
+Run tests: `busted tests/`
 
-```rust
-struct Test<T> {
-    setup: fn(&mut App) -> T,
-    setup_graphics: fn(&mut App, &T),
-    frames: u64,
-    check: fn(&App, T),
+## Love2D Testing Approaches
+
+### 1. Visual Debugging
+The fastest way to test in Love2D:
+
+```lua
+-- Debug overlay
+function drawDebug()
+    love.graphics.push()
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.print("Player: " .. player.x .. ", " .. player.y, 10, 50)
+    love.graphics.print("State: " .. currentState, 10, 70)
+    love.graphics.print("Universe: " .. universe.type, 10, 90)
+    love.graphics.pop()
+end
+```
+
+### 2. Assertion Helpers
+Build assertions into the game:
+
+```lua
+function assert_player_in_bounds()
+    assert(player.x >= 0 and player.x <= world.width)
+    assert(player.y >= 0 and player.y <= world.height)
+end
+
+-- Call in update loop during development
+if DEBUG then
+    assert_player_in_bounds()
+end
+```
 }
 
 impl<T> Test<T> {
@@ -149,333 +146,371 @@ fn test_collision_calculation() {
 }
 ```
 
+### 3. Performance Monitoring
+Build in performance tracking:
+
+```lua
+local perfStats = {
+    fps = 0,
+    drawCalls = 0,
+    memoryUsage = 0,
+}
+
+function updatePerfStats(dt)
+    perfStats.fps = love.timer.getFPS()
+    perfStats.memoryUsage = collectgarbage("count")
+end
+```
+
 ## Test Categories
 
-### 1. Feature Tests (Core Tests)
-Test complete game features as player would experience them.
+### 1. Interactive Feature Testing
+Test by playing with debug mode enabled:
 
-Location: `game/tests/features/`
+**Debug Checklist:**
+- Player movement feels smooth
+- Collision detection works at all speeds
+- Chunks load without visible pop-in
+- Universe transitions maintain state
+- No memory leaks (watch Lua memory usage)
 
-Examples:
-- `movement.rs` - Player movement in all directions
-- `collision.rs` - Can't walk through walls
-- `universe_transition.rs` - Travel between universes
-- `items.rs` - Picking up and using items
+### 2. Test States
+Create specific game states for testing:
 
-### 2. Development Test Scenes
-Test scenes that double as development environments. These are both automated tests AND playable scenes for iteration.
+```lua
+-- states/test_collision.lua
+local TestCollision = {}
 
-Location: `game/tests/scenes/`
+function TestCollision:enter()
+    -- Create test scenario
+    self.player = {x = 100, y = 100, w = 32, h = 32}
+    self.wall = {x = 200, y = 100, w = 32, h = 32}
+end
 
-Use when:
-- Testing complex multi-system interactions
-- Need visual debugging
-- Iterating on game feel (movement speed, jump height)
-- Testing procedural generation
+function TestCollision:update(dt)
+    -- Test movement toward wall
+    self.player.x = self.player.x + 100 * dt
+    
+    -- Check collision
+    if checkCollision(self.player, self.wall) then
+        print("Collision detected!")
+    end
+end
 
-Example:
-```rust
-#[test]
-fn universe_transition_scene() {
-    Test {
-        setup: |app| {
-            // Create two universes with portal between them
-            let player = app.world.spawn((
-                Player,
-                Transform::from_xyz(0.0, 0.0, 0.0),
-            )).id();
-            
-            setup_test_universes(app);
-            player
-        },
-        setup_graphics: |app, _| {
-            app.world.spawn(Camera2d);
-            // Add lights, debug UI, etc.
-        },
-        frames: 300,  // 5 seconds at 60fps
-        check: |app, player_id| {
-            // Player should have transitioned
-            let universe = app.world.get::<CurrentUniverse>(player_id);
-            assert_eq!(universe.unwrap().0, Universe::Dystopia);
-        }
-    }.run();
+function TestCollision:draw()
+    love.graphics.rectangle("fill", self.player.x, self.player.y, 32, 32)
+    love.graphics.rectangle("fill", self.wall.x, self.wall.y, 32, 32)
+end
+
+return TestCollision
+```
+
+### 3. Console Commands
+Add a debug console for live testing:
+
+```lua
+-- Debug console commands
+local commands = {
+    teleport = function(x, y)
+        player.x = tonumber(x) or 0
+        player.y = tonumber(y) or 0
+    end,
+    
+    spawn_box = function()
+        spawnQuantumBox(player.x + 100, player.y)
+    end,
+    
+    set_universe = function(type)
+        changeUniverse(type)
+    end,
+    
+    reload_chunks = function()
+        clearChunks()
+        loadChunksAroundPlayer()
+    end
 }
 ```
 
-### 3. Visual Regression Tests
-Ensure game looks correct (when we have sprites).
+### 4. Performance Benchmarks
+Monitor critical operations:
 
-Location: `game/tests/visual/`
-
-Approach: Render to image buffer, compare with golden images.
-
-### 4. Performance Tests
-Ensure features stay fast.
-
-```rust
-#[test]
-fn world_generation_is_linear() {
-    let times = vec![
-        measure_generation(100),   // 100 chunks
-        measure_generation(200),   // 200 chunks
-        measure_generation(400),   // 400 chunks
-    ];
-    assert_is_linear(times);
-}
-```
-
-### 5. Property Tests
-For procedural generation and physics.
-
-```rust
-#[test]
-fn all_generated_worlds_are_playable() {
-    for seed in 0..100 {
-        let world = generate_world(seed);
-        assert!(has_path_to_exit(world));
-        assert!(has_required_items(world));
-    }
-}
+```lua
+function benchmarkChunkGeneration()
+    local start = love.timer.getTime()
+    for i = 1, 100 do
+        generateChunk(i, i)
+    end
+    local elapsed = love.timer.getTime() - start
+    print("Generated 100 chunks in " .. elapsed .. " seconds")
+end
 ```
 
 ## Test Utilities
 
-Common patterns for Bevy testing:
+Common testing helpers for Love2D:
 
-### Fake Input
-```rust
-// Keyboard
-app.world.resource_mut::<ButtonInput<KeyCode>>().press(KeyCode::Up);
+### Simulate Input
+```lua
+-- Fake keyboard input
+function simulateKeypress(key)
+    love.keypressed(key)
+end
 
-// Mouse
-app.world.resource_mut::<ButtonInput<MouseButton>>().press(MouseButton::Left);
+function simulateKeyrelease(key)
+    love.keyreleased(key)
+end
+
+-- Fake mouse input
+function simulateClick(x, y)
+    love.mousepressed(x, y, 1)
+    love.mousereleased(x, y, 1)
+end
 ```
 
-### Send Events
-```rust
-app.world.resource_mut::<Events<Direction>>().send(Direction::Down);
+### Time Control
+```lua
+-- Speed up/slow down time for testing
+local timeScale = 1.0
+
+function love.update(dt)
+    dt = dt * timeScale
+    -- Rest of update logic
+end
+
+-- In tests
+timeScale = 10  -- Run 10x faster
+timeScale = 0.1 -- Run in slow motion
 ```
 
-### Query Without System
-```rust
-let player = app.world
-    .query_filtered::<&Transform, With<Player>>()
-    .single(&app.world);
+### State Snapshots
+```lua
+-- Save and restore game state
+function saveState()
+    return {
+        player = {x = player.x, y = player.y},
+        universe = universe.type,
+        chunks = table.copy(activeChunks)
+    }
+end
+
+function restoreState(state)
+    player.x = state.player.x
+    player.y = state.player.y
+    universe.type = state.universe
+    activeChunks = state.chunks
+end
 ```
 
-### Access Commands
-```rust
-use bevy::ecs::system::SystemState;
+## Love2D Testing Philosophy
 
-let mut state: SystemState<Commands> = SystemState::new(&mut app.world);
-let mut commands = state.get_mut(&mut app.world);
-commands.spawn((/* components */));
-state.apply(&mut app.world);
+### Interactive First
+Love2D's strength is rapid iteration. Use it:
+- Test by playing the game
+- Add debug visualizations liberally
+- Use hot reload to test changes instantly
+
+### Automated When Beneficial
+Write automated tests for:
+- Core game logic (collision math, etc.)
+- Procedural generation consistency
+- Save/load functionality
+
+### Visual Testing is Valid
+Unlike unit tests, visual confirmation is legitimate:
+- "Does it look right?" is a valid test
+- "Does it feel good?" matters for games
+- Performance "feels" smooth at 60 FPS
+
+## Common Love2D Testing Patterns
+
+### Debug Mode Toggle
+```lua
+-- Global debug flag
+DEBUG = false
+
+function love.keypressed(key)
+    if key == "f1" then
+        DEBUG = not DEBUG
+    end
+end
+
+function love.draw()
+    -- Normal game drawing
+    drawGame()
+    
+    -- Debug overlay
+    if DEBUG then
+        drawDebugInfo()
+    end
+end
 ```
 
-### Control Time (Bevy 0.16+)
-```rust
-// Advance time by specific amount
-let mut time = app.world.resource_mut::<Time>();
-time.advance_by(Duration::from_secs(2));
+### Test Harness State
+```lua
+-- Create a test harness game state
+local TestHarness = {}
+
+function TestHarness:init()
+    self.tests = {
+        "movement",
+        "collision", 
+        "chunks",
+        "universe"
+    }
+    self.currentTest = 1
+end
+
+function TestHarness:keypressed(key)
+    if key == "space" then
+        self.currentTest = self.currentTest + 1
+        self:loadTest(self.tests[self.currentTest])
+    end
+end
 ```
-
-## What We DON'T Do (Usually)
-
-### Avoid Mocks When Possible
-Prefer minimal real implementations. But if Bevy's Time is hard to control, using `thread::sleep` in one test is acceptable.
-
-### Test Systems Directly When It Makes Sense
-While we prefer feature tests, testing a pure calculation system directly is fine if it's cleaner.
-
-### Accept Practical Trade-offs
-A slow test that catches bugs is better than no test. Mark slow tests:
-
-```rust
-#[test]
-#[ignore]  // Run with: cargo test -- --ignored
-fn slow_integration_test() {
-    // Test that takes 10+ seconds
-}
-```
-
-### No Flaky Tests
-But if timing is unavoidable, use generous timeouts and mark as potentially flaky.
-
-## Known Bevy Testing Limitations
-
-Be aware of these current limitations:
-
-- **Time mocking**: Limited in older Bevy versions, use `Time::advance_by` in 0.16+
-- **Rendering tests**: Need headless rendering or Mesa's Lavapipe for CI
-- **Commands access**: Must use `SystemState` pattern (shown above)
-- **Query syntax**: Test queries use single tuple: `Query<(&A, &B, With<C>)>` not `Query<(&A, &B), With<C>>`
-- **Main thread**: Some plugins require main thread, won't work in tests
 
 ## Practical Workflow
 
 ### Adding a New Feature
-1. Decide on test pattern (check function, Test struct, or direct)
-2. Write the simplest test that could fail
-3. Implement until test passes
-4. Add edge cases as new tests
+1. Create feature in isolation (test state)
+2. Play with it interactively
+3. Add debug visualizations
+4. Integrate into main game
+5. Add automated tests if needed
 
-### When to Write Tests
-- **Immediately**: Core mechanics (movement, collision)
-- **Soon**: Game rules (universe transitions, item effects)
-- **As needed**: Complex interactions (use Test struct pattern)
-- **Eventually**: Polish features (particle effects, animations)
-- **Never**: Prototypes we're exploring
-
-### Making Tests Trivial to Add
-The check function pattern means adding a test is one line:
-
-```rust
-#[test]
-fn player_moves_right() {
-    check_movement(Vec2::ZERO, KeyCode::ArrowRight, Vec2::new(5.0, 0.0));
-}
-
-#[test]
-fn player_moves_diagonal() {
-    check_movement_multi(
-        Vec2::ZERO, 
-        vec![KeyCode::ArrowRight, KeyCode::ArrowUp],
-        Vec2::new(3.5, 3.5)  // Normalized diagonal
-    );
-}
-```
+### When to Test What
+- **Always test interactively**: Every feature
+- **Add debug mode for**: Complex systems (chunks, collision)
+- **Write automated tests for**: Math functions, algorithms
+- **Create test states for**: Isolated feature development
 
 ## Running Tests
 
 ```bash
-# Fast tests only (default)
-cargo test
+# Run the game normally
+love game/
 
-# Include slow tests
-cargo test -- --ignored
+# Run with debug mode
+love game/ --debug
 
-# Run with visual debugging
-VISUAL_TEST=1 cargo test movement
+# Run automated tests (if using Busted)
+cd game && busted
 
-# Specific feature
-cargo test movement
+# Run with console visible (macOS)
+love game/ --console
 
-# With timing info
-cargo test -- --nocapture --test-threads=1
-
-# Watch mode (requires cargo-watch)
-cargo watch -x test
+# Profile performance
+love game/ --profile
 ```
 
-## Test Infrastructure Investment
+## Development Tips
 
-Priority order for test infrastructure:
+### Hot Reload Setup
+```lua
+-- main.lua
+lurker = require "lib.lurker"
+lurker.postswap = function(f)
+    print("Reloaded: " .. f)
+end
 
-1. **Now**: Basic check functions for movement/collision
-2. **Soon**: Test struct pattern for complex scenes
-3. **Later**: Visual regression testing
-4. **Eventually**: Fuzzing for procedural generation
-5. **Maybe**: Snapshot testing for game state
+function love.update(dt)
+    lurker.update()
+    -- rest of update
+end
+```
+
+### Quick Iteration Loop
+1. Make change in editor
+2. Save file (triggers hot reload)
+3. See change immediately in game
+4. Press F1 for debug info
+5. Press F5 to reload current state
 
 ## Example: Complete Movement Test
 
-```rust
-// game/tests/features/movement.rs
+```lua
+-- game/tests/movement_test.lua
+local Player = require("src.player")
 
-use bevy::prelude::*;
-use coherence::*;
-
-// Simple check function for basic movement
-#[track_caller]
-fn check_movement(start: Vec2, input: KeyCode, expected: Vec2) {
-    let mut app = App::new();
-    app.add_plugins(MinimalPlugins)
-       .add_systems(Update, player_movement_system);
+-- Simple movement test
+describe("Player Movement", function()
+    local player
     
-    app.world.spawn((
-        Player,
-        Transform::from_translation(start.extend(0.0)),
-        Velocity::default(),
-    ));
+    before_each(function()
+        player = Player:new(100, 100)
+    end)
     
-    app.world.resource_mut::<ButtonInput<KeyCode>>().press(input);
-    app.update();
+    it("moves right", function()
+        player:update(1.0, {right = true})
+        assert.are.equal(200, player.x)
+        assert.are.equal(100, player.y)
+    end)
     
-    let player_transform = app.world
-        .query_filtered::<&Transform, With<Player>>()
-        .single(&app.world);
-        
-    assert_eq!(
-        player_transform.translation.truncate(), 
-        expected,
-        "Player should move from {:?} to {:?} when {:?} is pressed",
-        start, expected, input
-    );
-}
+    it("moves left", function()
+        player:update(1.0, {left = true})
+        assert.are.equal(0, player.x)
+        assert.are.equal(100, player.y)
+    end)
+    
+    it("normalizes diagonal movement", function()
+        player:update(1.0, {right = true, up = true})
+        -- Should move at ~70.7 pixels in each direction (normalized)
+        assert.is_true(math.abs(player.x - 170.7) < 1)
+        assert.is_true(math.abs(player.y - 29.3) < 1)
+    end)
+end)
 
-// Test struct for complex movement scenario
-#[test]
-fn movement_with_collision_scene() {
-    Test {
-        setup: |app| {
-            app.add_systems(Update, (movement_system, collision_system));
-            
-            // Spawn player
-            let player = app.world.spawn((
-                Player,
-                Transform::from_xyz(0.0, 0.0, 0.0),
-                Collider { radius: 0.5 },
-            )).id();
-            
-            // Spawn wall
-            app.world.spawn((
-                Wall,
-                Transform::from_xyz(5.0, 0.0, 0.0),
-                Collider { radius: 1.0 },
-            ));
-            
-            player
-        },
-        setup_graphics: |app, _| {
-            app.world.spawn(Camera2d);
-        },
-        frames: 60,
-        check: |app, player_id| {
-            let pos = app.world.get::<Transform>(player_id)
-                .unwrap()
-                .translation;
-            
-            // Should stop before wall
-            assert!(pos.x < 3.5, "Player should stop before wall");
-        }
-    }.run();
-}
+-- Interactive test state
+-- game/states/test_movement.lua
+local TestMovement = {}
 
-// Basic movement tests
-#[test]
-fn moves_right() {
-    check_movement(Vec2::ZERO, KeyCode::ArrowRight, Vec2::new(5.0, 0.0));
-}
+function TestMovement:init()
+    self.player = {x = 400, y = 300, speed = 200}
+    self.trails = {}  -- Visual trail for debugging
+end
 
-#[test]
-fn moves_left() {
-    check_movement(Vec2::ZERO, KeyCode::ArrowLeft, Vec2::new(-5.0, 0.0));
-}
+function TestMovement:update(dt)
+    -- Store trail
+    table.insert(self.trails, {x = self.player.x, y = self.player.y})
+    if #self.trails > 100 then
+        table.remove(self.trails, 1)
+    end
+    
+    -- Handle movement
+    local dx, dy = 0, 0
+    if love.keyboard.isDown("right") then dx = dx + 1 end
+    if love.keyboard.isDown("left") then dx = dx - 1 end
+    if love.keyboard.isDown("up") then dy = dy - 1 end
+    if love.keyboard.isDown("down") then dy = dy + 1 end
+    
+    -- Normalize diagonal
+    if dx ~= 0 and dy ~= 0 then
+        dx = dx * 0.707
+        dy = dy * 0.707
+    end
+    
+    self.player.x = self.player.x + dx * self.player.speed * dt
+    self.player.y = self.player.y + dy * self.player.speed * dt
+end
+
+function TestMovement:draw()
+    -- Draw trail
+    love.graphics.setColor(0.5, 0.5, 1, 0.3)
+    for _, pos in ipairs(self.trails) do
+        love.graphics.circle("fill", pos.x, pos.y, 2)
+    end
+    
+    -- Draw player
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.circle("fill", self.player.x, self.player.y, 16)
+    
+    -- Debug info
+    love.graphics.print("Movement Test - Arrow keys to move", 10, 10)
+    love.graphics.print(string.format("Position: %.1f, %.1f", self.player.x, self.player.y), 10, 30)
+end
+
+return TestMovement
 ```
-
-## Teaching Notes
-
-When implementing these patterns, we'll:
-
-1. **Start simple**: Basic check functions you can understand
-2. **Explain every line**: What each Bevy API does and why
-3. **Build up complexity**: Add Test struct only when needed
-4. **Learn by debugging**: Use VISUAL_TEST to see what's happening
-5. **Iterate quickly**: Tests as development tools, not just validation
 
 ## Key Takeaway
 
-**Test what the player sees and does, not how the code does it.**
-
-But be pragmatic - a working test that's slightly impure beats a perfect test that never gets written.
+**In Love2D, playing IS testing.** The rapid iteration cycle means you can test ideas immediately. Add debug visualization and interactive test states to make testing enjoyable and productive.

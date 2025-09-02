@@ -131,27 +131,58 @@ A top-down pixel art game inspired by the novel "Dark Matter" where players trav
 
 ## Technical Implementation Plan
 
-### Phase 1: Core Systems
-1. Basic Bevy setup with pixel-perfect camera
-2. Player movement (grid-based or smooth)
-3. Simple tilemap rendering
-4. The Lab room with UI sliders
+### Phase 1: Core Systems (Love2D)
+1. Basic Love2D window with conf.lua settings
+2. Player sprite and smooth movement
+3. Load tilemap with STI from Tiled
+4. Collision detection with Bump
+5. The Lab room as separate game state
 
 ### Phase 2: Procedural Generation
-1. Chunk system implementation
-2. Basic chunk types (meadow, forest, path)
-3. Universe type influences generation
-4. Box placement logic
+1. Chunk system with Love2D tables
+2. Generate chunks using Perlin noise
+3. Universe type influences chunk selection
+4. Dynamic loading/unloading of chunks
+5. Box placement with pathfinding check
 
 ### Phase 3: Polish
-1. Building enter/exit system
-2. Environmental hazards (dystopia)
-3. Visual effects and atmosphere
-4. Sound and music
+1. Game states with HUMP (menu, lab, world)
+2. Building enter/exit transitions
+3. Environmental hazards using Bump filters
+4. Shader effects for universe atmosphere
+5. Sound with Love2D audio
+
+## Love2D Implementation Details
+
+### Chunk Loading Strategy
+```lua
+-- Each chunk is 10x10 tiles
+-- Load 3x3 chunks around player
+-- Unload chunks > 2 chunks away
+local activeChunks = {}
+local CHUNK_SIZE = 10
+local TILE_SIZE = 32
+```
+
+### State Management with HUMP
+```lua
+-- states/lab.lua
+-- states/universe.lua
+-- states/menu.lua
+Gamestate = require "lib.hump.gamestate"
+```
+
+### Collision with Bump
+```lua
+-- Different collision types
+-- "player", "wall", "hazard", "box"
+local world = bump.newWorld(32)
+```
 
 ## Next Steps
-1. Set up Bevy project with basic player movement
-2. Create first batch of pixel art chunks (5-6 types)
-3. Implement basic chunk-based generation
-4. Build the Lab with working calibration sliders
-5. Test universe jumping between different world types
+1. Create basic Love2D game structure
+2. Implement player movement with Bump
+3. Design chunks in Tiled, export as Lua
+4. Build chunk loading system
+5. Create Lab state with UI sliders
+6. Test universe generation with different parameters

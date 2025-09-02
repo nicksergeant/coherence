@@ -2,35 +2,36 @@
 
 ## Overview
 
-Core technology stack: **Rust + Bevy** for learning-focused game development.
+Core technology stack: **Lua + Love2D** for rapid, iterative game development.
 
-### Why Bevy/Rust
-- **ECS Architecture**: Perfect for managing different universe systems and rules
-- **Native binaries**: Compiles to standalone macOS/Windows/Linux executables
-- **Performance**: Can handle complex simulations and thousands of entities
-- **Type safety**: Rust's compiler catches bugs early
-- **Modern ecosystem**: Active community, good documentation
+### Why Love2D/Lua
+- **Rapid Iteration**: Hot reload, immediate feedback, no compile times
+- **Simple Distribution**: 10-50MB native apps for macOS/Linux
+- **Proven Success**: Used by commercial hits like Balatro
+- **Lua Benefits**: Simple language, useful for Neovim config too
+- **Active Community**: Extensive libraries and resources
 
 ### Development Environment
-- **Editor**: Neovim with rust-analyzer LSP
+- **Editor**: Neovim with Lua LSP
 - **Key Tools**:
-  - `rust-analyzer`: LSP for autocomplete/linting
-  - `rustfmt`: Code formatting
-  - `clippy`: Additional linting
-  - `cargo-watch`: Hot reload during development
-- **Build times**: Initial builds 30-60s (use cargo-watch for iteration)
+  - `love`: The Love2D runtime
+  - `lurker`: Hot reload library for Love2D
+  - `Tiled`: Map editor for creating tilemaps
+  - `entr` or `watchman`: File watchers for auto-restart
+- **Iteration Speed**: Instant - save file and see changes
 
-## Rust Learning Challenges
-1. **Ownership/Borrowing**: Can't freely pass references around
-2. **No null/undefined**: Explicit `Option<T>` and `Result<T,E>`
-3. **Upfront edge case handling**: Less "make it work" flexibility
-4. **Compile times**: Longer than JS/TS development
+## Lua Learning Path
+1. **Tables everywhere**: Lua's only data structure
+2. **1-indexed arrays**: Different from most languages
+3. **Metatables**: Lua's approach to OOP and operators
+4. **Local by default**: Use `local` keyword extensively
+5. **No built-in classes**: Use libraries like HUMP.class
 
-## Rust Benefits
-- Pattern matching (similar to Elixir)
-- Zero-cost abstractions
-- Compiler-driven development
-- ECS forces good architectural thinking
+## Love2D Benefits
+- Immediate mode rendering
+- Built-in physics (Box2D)
+- Cross-platform from single codebase
+- Excellent 2D performance
 
 ## Repository Structure
 
@@ -39,37 +40,35 @@ Single repository with separate directories for each component:
 
 ```
 Coherence/
-├── game/                      # Rust/Bevy game
-│   ├── src/
-│   │   ├── main.rs
-│   │   └── systems/
-│   ├── assets/               # Game assets (generated + manual)
+├── game/                      # Love2D game
+│   ├── main.lua              # Entry point with love callbacks
+│   ├── conf.lua              # Love2D configuration
+│   ├── states/               # Game states (menu, play, etc)
+│   │   ├── menu.lua
+│   │   ├── play.lua
+│   │   └── lab.lua
+│   ├── lib/                  # Third-party libraries
+│   │   ├── bump/            # Collision detection
+│   │   ├── sti/             # Simple Tiled Implementation
+│   │   ├── hump/            # Utilities (gamestate, camera)
+│   │   └── lurker/          # Hot reload
+│   ├── src/                  # Game source code
+│   │   ├── player.lua
+│   │   ├── world.lua
+│   │   └── universe.lua
+│   ├── assets/               # Game assets
 │   │   ├── sprites/
 │   │   │   ├── characters/
-│   │   │   │   ├── player/
-│   │   │   │   │   ├── idle.png (32x32)
-│   │   │   │   │   ├── walk.png (32x128 sprite sheet)
-│   │   │   │   │   └── metadata.json
-│   │   │   │   └── npcs/
+│   │   │   │   ├── player.png (32x32)
+│   │   │   │   └── player_walk.png (128x32 sprite sheet)
 │   │   │   ├── tiles/
-│   │   │   │   ├── grass.png (32x32)
-│   │   │   │   ├── stone.png (32x32)
-│   │   │   │   └── tileset.json
-│   │   │   ├── objects/
-│   │   │   │   ├── portal.png (64x64)
-│   │   │   │   └── items.atlas
+│   │   │   │   └── tileset.png (256x256)
 │   │   │   └── ui/
-│   │   │       └── icons.png (256x256 atlas)
-│   │   ├── universes/
-│   │   │   ├── dystopia/
-│   │   │   │   └── palette.json
-│   │   │   ├── utopia/
-│   │   │   │   └── palette.json
-│   │   │   └── shared/
-│   │   │       └── base_palette.json
-│   │   └── metadata/
-│   │       └── generation_log.json
-│   ├── Cargo.toml
+│   │   │       └── icons.png
+│   │   ├── maps/            # Tiled map files
+│   │   │   ├── lab.lua      # Exported from Tiled
+│   │   │   └── chunks/      # Procedural chunk templates
+│   │   └── fonts/
 │   └── README.md
 │
 ├── art/                       # Python AI generation pipeline
@@ -90,12 +89,13 @@ Coherence/
 ├── docs/                      # Shared documentation
 │   ├── Game.md
 │   ├── Tech.md
-│   └── AI-Art-Pipeline.md
+│   └── Art.md
 │
 ├── scripts/                   # Root-level convenience scripts
-│   ├── setup.sh              # Install all dependencies
+│   ├── setup.sh              # Install Love2D and dependencies
 │   ├── generate-assets.sh   # Run art generation
-│   └── run-game.sh          # Build and run game
+│   ├── run.sh               # Run game with Love2D
+│   └── package.sh           # Package for distribution
 │
 ├── .gitignore
 └── README.md
@@ -105,8 +105,8 @@ Coherence/
 - **Single source of truth**: All code, assets, and docs in one place
 - **Atomic commits**: Changes to art pipeline and game can be committed together
 - **Simplified development**: No need to manage multiple repos or symlinks
-- **Easier onboarding**: Clone once, run setup script, everything works
-- **Consistent tooling**: Shared git hooks, CI/CD, formatting rules
+- **Easier onboarding**: Clone once, install Love2D, run game
+- **Hot reload friendly**: All assets in predictable locations
 
 ### Asset Specifications
 
@@ -138,22 +138,25 @@ Coherence/
 **Generation Workflow:**
 1. Run generator from root: `./scripts/generate-assets.sh`
 2. Python pipeline in `art/` outputs to `game/assets/`
-3. Bevy hot-reloads assets during development
+3. Love2D automatically uses new assets (no compilation needed)
 4. Commit both generation code and assets together
 
 **Convenience Scripts:**
 ```bash
 # From project root
-./scripts/setup.sh              # Install Rust, Python deps, ComfyUI
+./scripts/setup.sh              # Install Love2D, Python deps
 ./scripts/generate-assets.sh dystopia  # Generate universe assets
-./scripts/run-game.sh           # cargo run in game directory
+./scripts/run.sh               # Run game with Love2D
+./scripts/package.sh           # Create distributable .love file
 ```
 
-**Bevy Asset Loading:**
-```rust
-// Assets are loaded using Bevy's asset system
-// Hot-reloading enabled in development
-let texture_handle = asset_server.load("sprites/characters/player/idle.png");
+**Love2D Asset Loading:**
+```lua
+-- Assets are loaded directly
+local playerSprite = love.graphics.newImage("assets/sprites/player.png")
+-- Hot reload with lurker library
+lurker = require "lib.lurker"
+lurker.postswap = function(f) print("Reloaded " .. f) end
 ```
 
 ### Development Workflow
@@ -162,94 +165,154 @@ let texture_handle = asset_server.load("sprites/characters/player/idle.png");
    ```bash
    git clone <repo>
    cd Coherence
-   ./scripts/setup.sh
+   brew install love  # macOS
+   # or: sudo apt install love  # Linux
    ```
 
-2. **Asset Generation:**
+2. **Game Development:**
    ```bash
-   cd art
-   python scripts/generate.py --universe dystopia
+   # Run with hot reload
+   love game/
+   # Or with file watcher for auto-restart
+   ls game/**/*.lua | entr -r love game/
    ```
 
-3. **Game Development:**
+3. **Create Tiled Maps:**
    ```bash
-   cd game
-   cargo watch -x run  # Hot reload on code changes
+   # Open Tiled, create map, export as Lua
+   # Save to game/assets/maps/
    ```
 
-4. **Full Pipeline:**
+4. **Package for Distribution:**
    ```bash
-   # From root, generate then run
-   make assets && make run
+   # Create .love file
+   cd game && zip -r ../coherence.love . && cd ..
+   # Run packaged game
+   love coherence.love
    ```
 
-## Alternatives Considered
+## Key Love2D Libraries
 
-### Love2D + Lua
-- ✅ Fast iteration, simple API
-- ❌ Limited architecture, need to build own ECS
-- ❌ Lua quirks (1-indexed, tables for everything)
+### Core Libraries We'll Use
 
-### Godot + GDScript
-- ✅ Full game engine, easier learning curve
-- ❌ IDE-centric workflow (not vim-friendly)
-- ❌ Point-and-click approach
+**Bump** - Collision detection
+- Simple AABB collision
+- Perfect for tile-based games
+- `local world = bump.newWorld()`
 
-### Web-based (Elm, ClojureScript)
-- ✅ Functional programming paradigms
-- ❌ Want native binary, not browser game
+**STI (Simple Tiled Implementation)** - Tilemap loading
+- Load Tiled maps directly
+- Built-in Bump integration
+- `local map = sti('map.lua', {'bump'})`
+
+**HUMP** - Helper utilities
+- Gamestate management
+- Camera system
+- Timer utilities
+- Class system
+
+**Lurker** - Hot reload
+- Auto-reload changed files
+- Essential for rapid iteration
+
+### Game Structure
+
+```lua
+-- main.lua
+function love.load()
+    -- Initialize game
+end
+
+function love.update(dt)
+    -- Update logic
+end
+
+function love.draw()
+    -- Render game
+end
+```
+
+```lua
+-- conf.lua
+function love.conf(t)
+    t.window.title = "Coherence"
+    t.window.width = 1024
+    t.window.height = 768
+end
+```
 
 ## Learning Resources
 
-### Rust Basics
-- The Rust Book (official documentation)
-- Rustlings (exercises)
-- Rust by Example
+### Lua Basics
+- Programming in Lua (PIL) - Official book
+- Learn Lua in 15 Minutes
+- Lua Users Wiki
 
-### Bevy Specific
-- Bevy Book (official guide)
-- Bevy examples repository
-- Unofficial Bevy Cheat Book
+### Love2D Specific
+- Love2D Wiki - Comprehensive documentation
+- Sheepolution's Love2D Tutorial
+- CS50's Game Development course (uses Love2D)
+- Simple Tiled Implementation docs
+- Bump.lua documentation
 
-### ECS Concepts
-- Understanding Entity-Component-System architecture
-- Bevy's specific implementation
+### Example Projects
+- Simple Farmer (farming game in Love2D)
+- Mari0 (Mario + Portal mashup)
+- Move or Die source exploration
 
 ## Getting Started
-1. Install Rust toolchain (rustup)
-2. Set up Neovim with rust-analyzer
-3. Create new Bevy project
-4. Configure for fast iteration (dynamic linking in dev)
-5. Set up basic game loop and rendering
-6. Implement sprite loading and rendering
+
+### Installation
+```bash
+# macOS
+brew install love
+
+# Linux
+sudo apt install love
+
+# Verify installation
+love --version
+```
+
+### First Love2D Game
+1. Create `game/` directory
+2. Add `main.lua` with basic callbacks
+3. Run with `love game/`
+4. Add conf.lua for window settings
+5. Install libraries (bump, STI, hump)
+6. Set up hot reload with lurker
 
 ## Performance Considerations
-- Use texture atlases for sprites
-- Implement frustum culling for off-screen entities
-- Consider chunk-based loading for large universes
-- Profile early and often with cargo flamegraph
+- Use sprite batches for tiles
+- Limit draw calls with canvas/render targets
+- Chunk-based world loading/unloading
+- Efficient collision with spatial hashing (Bump)
+- Profile with `love.profiler` or jprof
 
 ## Technical Questions
-- Asset pipeline: How to manage and load pixel art efficiently?
-- Save system: How to serialize universe states?
-- Procedural generation: Use Wave Function Collapse for universe generation?
-- UI framework: egui vs custom implementation?
-- Sound/music: Which audio crate to use with Bevy?
-- Input handling: Keyboard only or gamepad support?
-- Lighting: Implement Jarl-like 2D lighting with bevy_magic_light_2d?
+- Chunk system: How to efficiently load/unload world chunks?
+- Save system: Serialize Lua tables or use SQLite?
+- Procedural generation: Perlin noise or Wave Function Collapse?
+- UI: Use SUIT library or custom implementation?
+- Distribution: .love file or fused executable?
+- Multiplayer: Possible with sock.lua for future?
+- Mobile: Love2D supports iOS/Android - consider later?
 
 ## Open Source References
-Key Bevy projects to study:
-- **AspenHalls** (https://github.com/Hellzbellz123/AspenHalls) - 2D top-down RPG
-- **bevy-colony-sim-game** (https://github.com/frederickjjoubert/bevy-colony-sim-game) - Colony sim mechanics
-- **colony** (https://github.com/ryankopf/colony) - Another colony sim with pathfinding
-- **seldom_pixel** - Bevy plugin for pixel art games
-- **bevy_pixel_camera** - Pixel-perfect camera handling
+Key Love2D projects to study:
+- **Simple Farmer** - Basic farming game example
+- **Push** - Resolution handling library
+- **Windfield** - Physics module wrapper
+- **anim8** - Animation library
+- **Tiled + STI examples** - Tilemap integration
+- **Cartographer** - Alternative to STI
+- **2D World Chunking** - Example infinite world system
 
 ## Next Technical Steps
-1. Set up Rust/Bevy development environment
-2. Complete Rust basics tutorial
-3. Build "Hello World" Bevy app with sprite rendering
-4. Implement basic top-down movement system
-5. Create simple tilemap renderer
-6. Prototype universe switching mechanism
+1. Install Love2D and create basic window
+2. Implement player movement with keyboard
+3. Load and render a tilemap with STI
+4. Add collision detection with Bump
+5. Create game state system with HUMP
+6. Build chunk-based world generation
+7. Implement universe jumping mechanic
