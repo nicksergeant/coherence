@@ -17,10 +17,10 @@ This is a **learning project** for someone with 20+ years of programming experie
 - **Build incrementally** - Working code at every step, no big bang integrations
 - Example progression:
   ```
-  Step 1: Create window with Bevy (10 lines)
-  Step 2: Add a blue square sprite (5 lines)  
-  Step 3: Make square move with arrow keys (15 lines)
-  Step 4: Add boundaries so square stays on screen (10 lines)
+  Step 1: Create window with Love2D (10 lines)
+  Step 2: Draw a colored rectangle (5 lines)  
+  Step 3: Make rectangle move with arrow keys (15 lines)
+  Step 4: Add boundaries so rectangle stays on screen (10 lines)
   ```
 
 ### 2. Explain Everything
@@ -72,7 +72,7 @@ When presenting code:
 
 ### 6. Decision Points
 Always present options before making technical decisions:
-- "We need to handle collision. We could: A) Use Bevy's built-in, B) Use Rapier2D, C) Write our own"
+- "We need to handle collision. We could: A) Use Bump.lua, B) Use Love2D's built-in physics (Box2D), C) Write our own"
 - Explain tradeoffs
 - Make recommendation
 - Wait for agreement

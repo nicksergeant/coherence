@@ -95,55 +95,6 @@ if DEBUG then
     assert_player_in_bounds()
 end
 ```
-}
-
-impl<T> Test<T> {
-    pub fn run(self) {
-        let mut app = App::new();
-        
-        // Add MinimalPlugins or DefaultPlugins based on env
-        if std::env::var("VISUAL_TEST").is_ok() {
-            app.add_plugins(DefaultPlugins);
-            let data = (self.setup)(&mut app);
-            (self.setup_graphics)(&mut app, &data);
-        } else {
-            app.add_plugins(MinimalPlugins);
-            let data = (self.setup)(&mut app);
-        }
-        
-        // Run simulation
-        for _ in 0..self.frames {
-            app.update();
-        }
-        
-        // Check results
-        (self.check)(&app, data);
-    }
-}
-```
-
-### Pattern 3: Direct System Testing
-For testing isolated systems without full app overhead.
-
-```rust
-#[test]
-fn test_collision_calculation() {
-    let mut world = World::new();
-    
-    // Setup entities directly
-    let entity_a = world.spawn((
-        Transform::from_xyz(0.0, 0.0, 0.0),
-        Collider { radius: 1.0 }
-    )).id();
-    
-    // Run system directly using SystemState
-    let mut state: SystemState<Query<&Transform>> = 
-        SystemState::new(&mut world);
-    let query = state.get(&world);
-    
-    // Check results
-    assert!(check_collision(query));
-}
 ```
 
 ### 3. Performance Monitoring
