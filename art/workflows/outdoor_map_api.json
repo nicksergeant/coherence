@@ -1,0 +1,76 @@
+{
+  "1": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "sd_xl_base_1.0.safetensors"
+    }
+  },
+  "2": {
+    "class_type": "LoraLoader",
+    "inputs": {
+      "lora_name": "rpgMapsDora_v5.safetensors",
+      "strength_model": 0.8,
+      "strength_clip": 0.8,
+      "model": ["1", 0],
+      "clip": ["1", 1]
+    }
+  },
+  "3": {
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Positive)"
+    },
+    "inputs": {
+      "text": "pixel art rpg overworld map top-down view, modern suburban neighborhood with streets and sidewalks, small research facility complex with parking lot, residential houses with yards and fences, paved roads with lane markings, street lights and power lines, small park area with trees and benches, convenience store and gas station, normal everyday earth location, realistic modern setting, mowed grass lawns, concrete sidewalks, asphalt roads, regular trees and bushes, 32x32 tile grid, muted natural colors",
+      "clip": ["2", 1]
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Negative)"
+    },
+    "inputs": {
+      "text": "blurry, realistic, 3d render, photograph, side view, isometric, first person, close-up, text, labels, UI elements, mini-map icons, fantasy elements, medieval, dragons, castles, dungeons, sci-fi spaceships, alien planets, antialiasing, smooth gradients",
+      "clip": ["2", 1]
+    }
+  },
+  "5": {
+    "class_type": "EmptyLatentImage",
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    }
+  },
+  "6": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 42,
+      "control_after_generate": "randomize",
+      "steps": 25,
+      "cfg": 6.0,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "karras",
+      "denoise": 1.0,
+      "model": ["2", 0],
+      "positive": ["3", 0],
+      "negative": ["4", 0],
+      "latent_image": ["5", 0]
+    }
+  },
+  "7": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["6", 0],
+      "vae": ["1", 2]
+    }
+  },
+  "8": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "outdoor_map",
+      "images": ["7", 0]
+    }
+  }
+}

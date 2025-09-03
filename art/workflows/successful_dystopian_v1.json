@@ -1,0 +1,11 @@
+{
+  "description": "Successful dystopian map with isometric-lite perspective",
+  "prompt_used": "pixel art game exactly copying stardew valley viewing angle, ground tiles flat from above, all buildings and objects showing front faces not roofs, post-apocalyptic suburban neighborhood, broken houses with visible doors and windows, cracked pavement with grass, abandoned cars from 3/4 view, research lab building damaged but standing, dead trees showing trunks, debris scattered on ground, dystopian but recognizable as earth suburb, no people no NPCs no characters",
+  "seed": 400,
+  "cfg": 6.0,
+  "steps": 25,
+  "sampler": "dpmpp_2m",
+  "lora": "rpgMapsDora_v5.safetensors",
+  "lora_strength": 0.8,
+  "notes": "This produced a nice 'isometric-lite' or '3/4 perspective' view similar to The Last of Us. Ground is mostly top-down with buildings at a gentle angle showing fronts. Good dystopian feel without being too destroyed."
+}

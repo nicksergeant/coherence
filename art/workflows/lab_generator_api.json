@@ -1,0 +1,76 @@
+{
+  "1": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "sd_xl_base_1.0.safetensors"
+    }
+  },
+  "2": {
+    "class_type": "LoraLoader",
+    "inputs": {
+      "lora_name": "rpgMapsDora_v5.safetensors",
+      "strength_model": 0.8,
+      "strength_clip": 0.8,
+      "model": ["1", 0],
+      "clip": ["1", 1]
+    }
+  },
+  "3": {
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Positive)"
+    },
+    "inputs": {
+      "text": "pixel art game tilemap, true top-down view of floor with furniture showing front faces like stardew valley perspective but NOT stardew valley art style, modern research laboratory, view directly down at gray tile floor but all desks computers and equipment facing forward, industrial pixel art style like old sierra or lucasarts games not farming sim, concrete laboratory with visible floor tile grid from above, metal lab benches showing front drawers and surfaces, old CRT monitors facing player on desks, microscopes and lab equipment on tables showing front view, central quantum device box visible from front, office chairs with wheels seen from front, file cabinets against walls showing front faces, cork board on wall visible straight on, camera positioned directly above floor looking straight down but all objects magically show their front like classic 2D rpg games, muted gray and blue industrial colors not bright cheerful farming colors, harsh pixel art with visible dithering patterns, 32x32 tile grid clearly visible on floor, perspective exactly like zelda link to the past or secret of mana where floor is pure top-down but objects are front-facing, scientific laboratory aesthetic with exposed pipes and industrial fixtures, no cozy rural elements, clinical and sterile atmosphere",
+      "clip": ["2", 1]
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Negative)"
+    },
+    "inputs": {
+      "text": "blurry, realistic, 3d render, photograph, isometric view, true isometric, 45 degree angle, extreme perspective, purely top-down view without front-facing objects, side view, profile view, mixed perspectives where some objects are top-down and others are angled differently, inconsistent viewing angles, overcrowded rooms, too much furniture, cluttered spaces, no walking room, fantasy elements, sci-fi technology, alien devices, futuristic holograms, cyberpunk, steampunk, magic, glowing neon, laser beams, floating objects, unrealistic technology, random light placement, lights on floor, lights in illogical places, text labels, ui elements, hud overlay, antialiasing, smooth gradients, soft edges, painted style, watercolor, oil painting, characters, people, npcs, excessive detail, too many props, chairs and tables everywhere, objects blocking paths, non-earth setting, space station, alien world",
+      "clip": ["2", 1]
+    }
+  },
+  "5": {
+    "class_type": "EmptyLatentImage",
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    }
+  },
+  "6": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 42,
+      "control_after_generate": "randomize",
+      "steps": 25,
+      "cfg": 7.5,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "karras",
+      "denoise": 1.0,
+      "model": ["2", 0],
+      "positive": ["3", 0],
+      "negative": ["4", 0],
+      "latent_image": ["5", 0]
+    }
+  },
+  "7": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["6", 0],
+      "vae": ["1", 2]
+    }
+  },
+  "8": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "lab_concept",
+      "images": ["7", 0]
+    }
+  }
+}
