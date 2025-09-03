@@ -66,7 +66,8 @@ class ImageUpscaler:
             full_prompt = f"{base_prompt}, post-apocalyptic suburban neighborhood, broken houses with visible window frames and door details, individual roof tiles visible, cracked pavement with detailed texture, grass blades growing between cracks, abandoned cars with rust patches and broken windows, research lab facility with equipment visible through windows, dead trees with bark texture, scattered debris with recognizable items, dystopian suburban area, ultra high resolution pixel art, sharp pixel details, intricate textures on every surface"
         
         # Calculate dimensions (assuming square input for simplicity)
-        output_size = 1024 * scale
+        # Limit to 1536 max for Apple Silicon stability
+        output_size = min(1024 * scale, 1536)
         
         workflow = {
             "1": {
