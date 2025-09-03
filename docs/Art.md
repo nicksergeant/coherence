@@ -26,12 +26,12 @@ AI generates different styles each time you prompt it. "pixel art tree" today lo
 
 ```
 Your Computer:
-├── ~/ComfyUI/                    # Separate installation (not in repo)
+├── ~/Code/ComfyUI/               # Separate installation (not in repo)
 │   ├── models/checkpoints/       # Large model files (5-10GB each)
-│   ├── models/loras/            # Style LoRAs (smaller ~100MB)
+│   ├── models/loras/            # Style LoRAs/DoRAs (smaller ~100MB)
 │   └── models/controlnet/       # ControlNet models for consistency
 │
-└── coherence/                    # Your game repo
+└── ~/Code/coherence/             # Your game repo
     └── art/
         ├── workflows/           # ComfyUI JSON workflows (versioned)
         ├── styles/              # Style definitions (versioned)
@@ -145,14 +145,17 @@ Generate full asset sets with consistency:
 ### Installation (Separate from repo)
 
 ```bash
-# Install in home directory
-cd ~
+# Install in ~/Code directory (or your preferred location)
+cd ~/Code
 git clone https://github.com/comfyanonymous/ComfyUI
 cd ComfyUI
 
 # Create Python environment
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
+
+# Upgrade pip
+pip install --upgrade pip
 
 # Install with Apple Silicon support
 pip install torch torchvision torchaudio
@@ -161,29 +164,63 @@ pip install -r requirements.txt
 
 ### Required Models
 
-1. **Base Model** (Pick one):
-   - Stable Diffusion 1.5 (4GB) - Faster, good enough
-   - SDXL (6GB) - Better quality, slower
+#### For High-End Systems (32GB RAM, M4 Max or similar):
 
-2. **LoRA for Pixel Art** (Required):
-   - "Pixel Art XL" from Civitai
-   - Place in `ComfyUI/models/loras/`
+1. **SDXL Base Model** (6.5GB):
+   ```bash
+   cd ~/Code/ComfyUI/models/checkpoints
+   wget https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors
+   ```
 
-3. **ControlNet** (For consistency):
-   - "control_v11f1e_sd15_tile" - Style matching
-   - Place in `ComfyUI/models/controlnet/`
+2. **SDXL Refiner** (6GB - Optional but recommended):
+   ```bash
+   wget https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors
+   ```
+
+3. **RPG Maps DoRA** (For map generation):
+   - Download from: https://civitai.com/models/840900
+   - Use DoRA version for better quality when running locally
+   - Place in `~/Code/ComfyUI/models/loras/`
+
+4. **Pixel Art XL LoRA** (For character/object sprites):
+   - Download from: https://civitai.com/models/120096/pixel-art-xl
+   - Place in `~/Code/ComfyUI/models/loras/`
+
+5. **ControlNet for SDXL** (2.5GB - For style consistency):
+   ```bash
+   cd ~/Code/ComfyUI/models/controlnet
+   wget https://huggingface.co/xinsir/controlnet-union-sdxl-1.0/resolve/main/diffusion_pytorch_model.safetensors -O controlnet_sdxl.safetensors
+   ```
+
+#### For Standard Systems:
+
+1. **Base Model**: Stable Diffusion 1.5 (4GB)
+2. **LoRA**: Pixel Art XL from Civitai
+3. **ControlNet**: control_v11f1e_sd15_tile
 
 ### Running ComfyUI
 
 ```bash
 # Terminal 1: Run ComfyUI server
-cd ~/ComfyUI
+cd ~/Code/ComfyUI
 source venv/bin/activate
 python main.py --listen
 
 # Terminal 2: Run generation scripts
-cd ~/coherence/art
+cd ~/Code/coherence/art
 python scripts/generate.py "player sprite"
+```
+
+### Testing Installation
+
+```bash
+# Start ComfyUI
+cd ~/Code/ComfyUI
+source venv/bin/activate
+python main.py --listen
+
+# Open browser to http://localhost:8188
+# You should see the ComfyUI interface
 ```
 
 ## Workflow Examples
@@ -306,13 +343,36 @@ class ArtGenerator:
 **Problem**: Scripts can't reach localhost:8188
 **Solution**: Ensure ComfyUI is running with `--listen` flag
 
+## Model Usage Strategy
+
+### Concept-First Workflow
+1. **Generate full concept maps** using RPG Maps DoRA for inspiration
+2. **Extract individual tiles** from concepts you like
+3. **Generate clean tile versions** using extracted tiles as ControlNet references
+4. **Create transition tiles** for seamless blending between terrain types
+
+### Model Combinations
+- **RPG Maps DoRA alone**: Full map concepts, room layouts
+- **Pixel Art XL alone**: Individual sprites, characters, objects  
+- **Both together** (reduced strength): Consistent style across maps and sprites
+- **With ControlNet**: Enforce style matching between different generations
+
+### Tile Edge Handling
+- **Autotiling**: Use Tiled's terrain brushes with 15-47 tile sets
+- **Wang Tiles**: Create specific edge combinations, let Tiled auto-connect
+- **AI Transitions**: Generate specific transition tiles ("grass to stone transition, left grass, right stone")
+
 ## Next Steps
 
-1. **Install ComfyUI** in your home directory
-2. **Download models** (SD 1.5 + Pixel Art LoRA minimum)
-3. **Generate first reference** manually in ComfyUI
-4. **Set up style YAMLs** for each universe
-5. **Test generation** with reference-based consistency
-6. **Build asset library** through iterative generation
+1. ✅ **Install ComfyUI** in ~/Code directory
+2. ✅ **Download models** (SDXL + RPG Maps DoRA + Pixel Art XL + ControlNet)
+3. **Test ComfyUI server** - Run and access web UI
+4. **Generate first concept map** for overall style vision
+5. **Create art directory structure** in coherence repo
+6. **Set up style YAMLs** for each universe
+7. **Generate first reference sprites** manually in ComfyUI
+8. **Build generation scripts** for automation
+9. **Extract and create individual tiles** from concepts
+10. **Set up Tiled** with autotiling rules
 
-The key is starting simple: one good reference sprite, then building everything else to match it.
+The key is starting with concept maps for vision, then building individual assets to match that vision.
