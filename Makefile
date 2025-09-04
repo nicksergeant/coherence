@@ -1,2 +1,6 @@
 run:
-	cd game && cargo watch -c -x "check" -x  "run"
+	@love game $(filter-out $@,$(MAKECMDGOALS))
+
+# Prevent "No rule to make target" errors for args
+%:
+	@:
