@@ -2,7 +2,10 @@
 
 ## Overview
 
-AI-first approach to creating consistent pixel art for Coherence. We use ComfyUI with Stable Diffusion to generate all art assets, maintaining consistency through reference images and fixed workflows. Everything is version-controlled through YAML configs and JSON workflows.
+AI-first approach to creating consistent pixel art for Coherence. We use a hybrid approach:
+- **Leonardo.AI** for individual sprites and tiles (better prompt adherence for game assets)
+- **ComfyUI with Stable Diffusion** for concept maps and batch generation
+Everything is version-controlled through prompts, configs, and final assets.
 
 ## Core Principles
 
@@ -362,17 +365,70 @@ class ArtGenerator:
 - **Wang Tiles**: Create specific edge combinations, let Tiled auto-connect
 - **AI Transitions**: Generate specific transition tiles ("grass to stone transition, left grass, right stone")
 
+## Current Status (September 2024)
+
+### Completed Assets
+Using Leonardo.AI Phoenix 1.0 model, we've generated:
+
+1. **Grass Tile** (64x64)
+   - 3/4 perspective dystopian grass with dirt patches
+   - Seamless tiling confirmed
+   - Located: `game/assets/tiles/grass.png`
+
+2. **Player Character** (48x48 each)
+   - 4 directional sprites (down, up, left, right)
+   - Scientist with backpack aesthetic
+   - Consistent 3/4 top-down perspective
+   - Located: `game/assets/sprites/player_*.png`
+
+3. **Portal Box** (192x192)
+   - Metal cube structure with entrance
+   - Top-down view with south-facing door
+   - Player can walk into it from below
+   - Located: `game/assets/sprites/portal.png`
+
+### Leonardo.AI Learnings
+
+#### What Works
+- **Phoenix 1.0 model** with Illustration style
+- **Prompt Enhance OFF** for technical precision
+- **Style References** using existing sprites for consistency
+- **Single sprites first**, then other angles using style reference
+- **Explicit perspective instructions** ("3/4 view like Stardew Valley")
+
+#### Prompt Templates That Worked
+
+**For Tiles:**
+```
+simple pixel art grass tile, 64x64 pixels, 3/4 perspective, sparse grass tufts on dirt, 
+dystopian yellowed grass, seamless tiling edges, minimal detail for small tile size
+```
+
+**For Characters:**
+```
+pixel art game character sprite, scientist survivor with backpack, 3/4 perspective viewed 
+from above at 45 degree angle like stardew valley, facing DOWN toward viewer, 64x64 pixels, 
+standing idle pose, simple pixel art style, transparent background
+```
+
+**For Buildings:**
+```
+smooth metal cube building, 192x192 pixel art, doorway on SOUTH-FACING WALL pointing 
+directly at viewer, entrance at BOTTOM OF IMAGE where player walks up from below
+```
+
+### ComfyUI Status
+- Models installed (SDXL, RPG Maps DoRA, Pixel Art XL)
+- Workflows created but better for full maps than individual tiles
+- tile_api.json workflow configured but generates tilesets not single tiles
+
 ## Next Steps
 
-1. ✅ **Install ComfyUI** in ~/Code directory
-2. ✅ **Download models** (SDXL + RPG Maps DoRA + Pixel Art XL + ControlNet)
-3. **Test ComfyUI server** - Run and access web UI
-4. **Generate first concept map** for overall style vision
-5. **Create art directory structure** in coherence repo
-6. **Set up style YAMLs** for each universe
-7. **Generate first reference sprites** manually in ComfyUI
-8. **Build generation scripts** for automation
-9. **Extract and create individual tiles** from concepts
-10. **Set up Tiled** with autotiling rules
+1. ✅ **Generate minimal viable assets** (grass, character, portal)
+2. **Implement Love2D test scene** with generated assets
+3. **Test movement and collision** with placeholder physics
+4. **Generate additional tiles** as needed (walls, different terrain)
+5. **Consider training custom Leonardo model** for perfect consistency (40 sprite training set)
+6. **Create sprite animations** (walk cycles) once base sprites confirmed
 
-The key is starting with concept maps for vision, then building individual assets to match that vision.
+The key learning: Leonardo.AI is superior for individual game assets, while ComfyUI excels at concept generation.

@@ -21,17 +21,18 @@ This project exists primarily to learn:
 
 ### Current Progress
 
-🚧 **Early Development** - Setting up Love2D foundation
+🚧 **Early Development** - Art assets created, ready for Love2D implementation
 
 - ✅ Project structure and documentation
+- ✅ Art pipeline established (Leonardo.AI + ComfyUI)
+- ✅ Initial game assets generated (character, tiles, portal)
 - ⏳ Basic Love2D window and game loop
-- ⏳ Player movement with keyboard input
+- ⏳ Player movement with keyboard input  
 - ⏳ Tilemap rendering with STI (Simple Tiled Implementation)
 - ⏳ Collision detection with Bump
 - ⏳ Game state management with HUMP
 - ⏳ Universe transition system
 - ⏳ Procedural world generation
-- ⏳ Art pipeline setup
 
 ## Tech Stack
 
@@ -82,7 +83,17 @@ Coherence/
 │   ├── states/
 │   ├── lib/    # Third-party libraries (Bump, STI, HUMP)
 │   └── assets/
-├── art/        # AI art generation pipeline (not yet implemented)
+│       ├── sprites/
+│       │   ├── player_down.png (48x48)
+│       │   ├── player_up.png (48x48)
+│       │   ├── player_left.png (48x48)
+│       │   ├── player_right.png (48x48)
+│       │   └── portal.png (192x192)
+│       └── tiles/
+│           └── grass.png (64x64)
+├── art/        # AI art generation pipeline (Leonardo.AI + ComfyUI)
+│   ├── workflows/  # ComfyUI JSON workflows
+│   └── scripts/    # Generation automation
 ├── docs/       # Extensive documentation
 └── scripts/    # Build and utility scripts (planned)
 ```
@@ -111,12 +122,13 @@ This is a personal learning project, but if you're also learning:
 
 ## Current Focus
 
-Setting up Love2D foundation with:
-- Basic game loop (love.load, love.update, love.draw)
-- Keyboard input handling
-- Simple sprite rendering
-- Understanding Lua tables and metatables
-- Game state management patterns
+Ready to implement basic gameplay:
+- ✅ Generated all minimal art assets (player, grass, portal)
+- Next: Basic game loop (love.load, love.update, love.draw)
+- Next: Render tilemap of grass tiles
+- Next: Draw player sprite with 4-directional movement
+- Next: Add portal box as interactive object
+- Next: Basic collision detection
 
 ## License
 

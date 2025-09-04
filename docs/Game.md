@@ -8,11 +8,18 @@ A top-down pixel art game inspired by "Dark Matter" where players travel between
 A top-down pixel art game inspired by the novel "Dark Matter" where players travel between parallel universes. Each universe is procedurally generated using a chunk-based system, creating infinite unique worlds to explore.
 
 ## Visual Style
-- Top-down perspective similar to Stardew Valley and Jarl
-- 16-bit pixel art aesthetic
+- 3/4 top-down perspective exactly like Stardew Valley
+- 16-bit pixel art aesthetic  
 - Low-fi graphics focusing on gameplay over visual complexity
-- Jarl-like atmosphere with cozy yet mysterious feeling
-- Dynamic lighting effects for different universes (if feasible)
+- Dystopian scientist aesthetic with muted colors
+- Consistent 48x48 character sprites, 64x64 tiles
+
+### Asset Specifications
+- **Tiles**: 64x64 pixels (grass, dirt, concrete, etc.)
+- **Characters**: 48x48 pixels (slightly smaller than tiles for proper proportions)
+- **Buildings/Large Objects**: 192x192 or 256x256 (3x3 or 4x4 tiles)
+- **Perspective**: 3/4 view with ~45 degree camera angle from above
+- **Art Generation**: Leonardo.AI Phoenix 1.0 model for consistency
 
 ## MVP Core Gameplay Loop
 
