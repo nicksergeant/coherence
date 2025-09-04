@@ -1,139 +1,38 @@
 # Coherence
 
-**🎓 A learning project**: Building a game to learn Lua, Love2D, and game development fundamentals.
+A learning project to explore Lua, Love2D, and game development by building a top-down pixel art game about jumping between parallel universes.
 
-## The Game Concept
+## What I'm Learning
 
-A top-down pixel art game about jumping between parallel universes, inspired by the novel "[Dark Matter](https://en.wikipedia.org/wiki/Dark_Matter_(Crouch_novel))" by Blake Crouch.
+- **Lua** - My first time with this language
+- **Love2D** - Learning game development fundamentals 
+- **Game Design** - Understanding game loops, collision, rendering
+- **Procedural Generation** - Creating infinite worlds
 
-In Coherence, you control the chaos. Adjust your quantum device's parameters—Stability, Coherence, and Resonance—before each jump into the multiverse. Will you land in a utopian paradise or a collapsing dystopia? Every universe is procedurally generated, ensuring no two jumps are the same.
+## The Game
 
-## Learning Journey
+Inspired by "Dark Matter" by Blake Crouch. You control a quantum device to jump between procedurally generated universes - from utopias to dystopias. Each jump is unique.
 
-This project exists primarily to learn:
+## Status
 
-### What I'm Learning
-- **Lua** - Simple, powerful scripting language (also useful for Neovim config)
-- **Love2D** - 2D game framework with immediate mode rendering and hot reload
-- **Game Development** - First game project, learning core concepts like game loops, collision, rendering
-- **Procedural Generation** - Chunk-based world generation algorithms
-- **AI Art Workflows** - Building automated pipelines for asset creation
+🚧 Early learning phase - currently setting up Love2D and learning the basics.
 
-### Current Progress
-
-🚧 **Early Development** - Art assets created, ready for Love2D implementation
-
-- ✅ Project structure and documentation
-- ✅ Art pipeline established (Leonardo.AI + ComfyUI)
-- ✅ Initial game assets generated (character, tiles, portal)
-- ⏳ Basic Love2D window and game loop
-- ⏳ Player movement with keyboard input  
-- ⏳ Tilemap rendering with STI (Simple Tiled Implementation)
-- ⏳ Collision detection with Bump
-- ⏳ Game state management with HUMP
-- ⏳ Universe transition system
-- ⏳ Procedural world generation
-
-## Tech Stack
-
-Chosen for rapid iteration and learning:
-
-- **Game Framework**: Love2D - Fast iteration, proven track record (Balatro)
-- **Language**: Lua - Simple, powerful, useful beyond gamedev (Neovim)
-- **Tilemap Editor**: Tiled - Industry standard, works great with STI
-- **Libraries**: Bump (collision), STI (tilemaps), HUMP (utilities)
-- **Art Pipeline**: AI-generated pixel art - Since I can't draw
-- **Distribution**: Love2D bundles to ~10-50MB native apps
-
-## Documentation
-
-Extensive documentation as part of the learning process:
-
-- [Game Design](docs/Game.md) - Core mechanics and gameplay
-- [Technical Architecture](docs/Tech.md) - Technology decisions and setup
-- [Art Pipeline](docs/Art.md) - AI-powered asset generation
-- [Testing Strategy](docs/Testing.md) - How to test games effectively
-- [Project Guidelines](docs/Project.md) - Development principles
-
-## Getting Started
+## Running
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/coherence.git
-cd coherence
-
 # Install Love2D (macOS)
 brew install love
 
 # Run the game
 love game/
-
-# Or run with hot reload (if using a file watcher)
-# Example with entr:
-ls game/*.lua | entr -r love game/
 ```
 
-## Project Structure
+## Documentation
 
-```
-Coherence/
-├── game/       # Love2D game code
-│   ├── main.lua
-│   ├── conf.lua
-│   ├── states/
-│   ├── lib/    # Third-party libraries (Bump, STI, HUMP)
-│   └── assets/
-│       ├── sprites/
-│       │   ├── player_down.png (48x48)
-│       │   ├── player_up.png (48x48)
-│       │   ├── player_left.png (48x48)
-│       │   ├── player_right.png (48x48)
-│       │   └── portal.png (192x192)
-│       └── tiles/
-│           └── grass.png (64x64)
-├── art/        # AI art generation pipeline (Leonardo.AI + ComfyUI)
-│   ├── workflows/  # ComfyUI JSON workflows
-│   └── scripts/    # Generation automation
-├── docs/       # Extensive documentation
-└── scripts/    # Build and utility scripts (planned)
-```
-
-## Development Approach
-
-1. **Small Steps**: Every change is 10-50 lines for learning clarity
-2. **Document Everything**: Understanding > implementation
-3. **Test-Driven**: Tests explain what features should do
-4. **Learn in Public**: Code and docs show the learning process
-
-## Contributing
-
-This is a personal learning project, but if you're also learning:
-- Feel free to explore the code and documentation
-- Issues/questions that help me learn are welcome
-- Consider forking for your own learning journey
-
-## Why This Stack?
-
-- **Why Love2D over Godot/Unity?** Rapid iteration, simple distribution, learn Lua for Neovim
-- **Why Lua over other languages?** Simple to learn, useful for config files, proven for games
-- **Why not web-based?** Want native performance and simple binary distribution
-- **Why AI art?** Can't draw, but want custom assets
-- **Why so much documentation?** Writing helps understanding
-
-## Current Focus
-
-Ready to implement basic gameplay:
-- ✅ Generated all minimal art assets (player, grass, portal)
-- Next: Basic game loop (love.load, love.update, love.draw)
-- Next: Render tilemap of grass tiles
-- Next: Draw player sprite with 4-directional movement
-- Next: Add portal box as interactive object
-- Next: Basic collision detection
-
-## License
-
-MIT - See [LICENSE](LICENSE) file for details. Feel free to use any code for your own learning!
+- [Game Design](docs/Game.md) - What we're building
+- [Technical Notes](docs/Tech.md) - Love2D and Lua setup
+- [Learning Guidelines](docs/Project.md) - How this learning project works
 
 ---
 
-*This is my first game and first Lua project. The code reflects a learning journey, not production best practices. That's intentional - this is about learning, not shipping.*
+*This is my first game and first Lua project. The code reflects a learning journey.*
