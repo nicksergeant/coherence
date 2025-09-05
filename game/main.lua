@@ -1,64 +1,65 @@
 local lurker = require("lib.lurker")
 
-lurker.postswap = function(f)
-    print("Reloaded: " .. f)
-    love.load()
+local game = {}
+
+local function loadModules()
+    package.loaded.player = nil
+    package.loaded.tilemap = nil
+    package.loaded.camera = nil
+
+    game.player = require("player")
+    game.tilemap = require("tilemap")
+    game.camera = require("camera")
 end
 
-local pos
-local playerWidth = 36
-local playerHeight = 48
+local function initializeGame(keepPlayerPosition)
+    game.tilemap.init()
+
+    if not keepPlayerPosition then
+        game.player.x = love.graphics.getWidth() / 2
+        game.player.y = love.graphics.getHeight() / 2
+    end
+
+    game.worldWidth = game.tilemap.mapWidth * game.tilemap.tileSize
+    game.worldHeight = game.tilemap.mapHeight * game.tilemap.tileSize
+    game.camera.init(game.player, game.worldWidth, game.worldHeight)
+end
+
+loadModules()
+
+lurker.preswap = function()
+    if game.player then
+        game.savedPlayerX = game.player.x
+        game.savedPlayerY = game.player.y
+    end
+end
+
+lurker.postswap = function(f)
+    print("Reloaded: " .. f)
+
+    loadModules()
+
+    if game.savedPlayerX then
+        game.player.x = game.savedPlayerX
+        game.player.y = game.savedPlayerY
+    end
+
+    initializeGame(true)
+end
 
 function love.load()
-    love.graphics.setBackgroundColor(0.9, 0.9, 0.9, 1)
-    pos = {
-        x = 750,
-        y = 400,
-    }
+    initializeGame(false)
     print("Game started!")
 end
 
 function love.draw()
-    love.graphics.setColor(0.093, 0.673, 0.999, 1.0)
-    love.graphics.rectangle("fill", pos.x, pos.y, playerWidth, playerHeight, 50, 50, 1000)
-    love.graphics.setColor(0, 0, 0, 1)
+    game.camera.apply()
+    game.tilemap.draw(game.camera.x, game.camera.y)
+    game.player.draw()
 end
 
 function love.update(dt)
     lurker.update()
-
-    local speed = 200
-
-    if love.keyboard.isDown("rshift") or love.keyboard.isDown("lshift") then
-        speed = 100
-    end
-
-    local dx, dy = 0, 0
-
-    if love.keyboard.isDown("a") then
-        dx = -1
-    end
-    if love.keyboard.isDown("d") then
-        dx = 1
-    end
-    if love.keyboard.isDown("w") then
-        dy = -1
-    end
-    if love.keyboard.isDown("s") then
-        dy = 1
-    end
-
-    if dx ~= 0 and dy ~= 0 then
-        dx = dx * 0.707
-        dy = dy * 0.707
-    end
-
-    pos.x = pos.x + dx * speed * dt
-    pos.y = pos.y + dy * speed * dt
-
-    local windowWidth = love.graphics.getWidth()
-    local windowHeight = love.graphics.getHeight()
-
-    pos.x = math.max(0, math.min(pos.x, windowWidth - playerWidth))
-    pos.y = math.max(0, math.min(pos.y, windowHeight - playerHeight))
+    game.player.update(dt, game.worldWidth, game.worldHeight)
+    game.camera.update(game.player, game.worldWidth, game.worldHeight)
 end
