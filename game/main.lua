@@ -29,6 +29,10 @@ function love.update(dt)
 
     local speed = 200
 
+    if love.keyboard.isDown("rshift") or love.keyboard.isDown("lshift") then
+        speed = 100
+    end
+
     local dx, dy = 0, 0
 
     if love.keyboard.isDown("a") then
