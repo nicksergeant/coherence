@@ -26,18 +26,27 @@ function love.update(dt)
     lurker.update()
 
     local speed = 200
-    local move = speed * dt
 
-    if love.keyboard.isDown("a") or love.keyboard.isDown("left") then
-        pos.x = pos.x - move
+    local dx, dy = 0, 0
+
+    if love.keyboard.isDown("a") then
+        dx = -1
     end
-    if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
-        pos.x = pos.x + move
+    if love.keyboard.isDown("d") then
+        dx = 1
     end
-    if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
-        pos.y = pos.y - move
+    if love.keyboard.isDown("w") then
+        dy = -1
     end
-    if love.keyboard.isDown("s") or love.keyboard.isDown("down") then
-        pos.y = pos.y + move
+    if love.keyboard.isDown("s") then
+        dy = 1
     end
+
+    if dx ~= 0 and dy ~= 0 then
+        dx = dx * 0.707
+        dy = dy * 0.707
+    end
+
+    pos.x = pos.x + dx * speed * dt
+    pos.y = pos.y + dy * speed * dt
 end
