@@ -6,6 +6,8 @@ lurker.postswap = function(f)
 end
 
 local pos
+local playerWidth = 36
+local playerHeight = 48
 
 function love.load()
     love.graphics.setBackgroundColor(0.9, 0.9, 0.9, 1)
@@ -18,7 +20,7 @@ end
 
 function love.draw()
     love.graphics.setColor(0.093, 0.673, 0.999, 1.0)
-    love.graphics.rectangle("fill", pos.x, pos.y, 36, 48, 50, 50, 1000)
+    love.graphics.rectangle("fill", pos.x, pos.y, playerWidth, playerHeight, 50, 50, 1000)
     love.graphics.setColor(0, 0, 0, 1)
 end
 
@@ -49,4 +51,10 @@ function love.update(dt)
 
     pos.x = pos.x + dx * speed * dt
     pos.y = pos.y + dy * speed * dt
+
+    local windowWidth = love.graphics.getWidth()
+    local windowHeight = love.graphics.getHeight()
+
+    pos.x = math.max(0, math.min(pos.x, windowWidth - playerWidth))
+    pos.y = math.max(0, math.min(pos.y, windowHeight - playerHeight))
 end
