@@ -5,19 +5,19 @@ lurker.postswap = function(f)
     love.load()
 end
 
-local pos
+local text, pos
 
 function love.load()
     pos = {
         x = 50,
         y = 50,
     }
-
+    text = love.graphics.newText(love.graphics.getFont(), "Hello World")
     print("Game started!")
 end
 
 function love.draw()
-    love.graphics.draw(love.graphics.newText(love.graphics.getFont(), "Hello World"), pos.x, pos.y)
+    love.graphics.draw(text, pos.x, pos.y)
 end
 
 function love.update(dt)
