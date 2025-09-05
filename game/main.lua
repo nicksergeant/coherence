@@ -1,8 +1,13 @@
-local text, pos
+local lurker = require("lib.lurker")
 
-function love.load(args)
-    local msg = args[1] or nil
-    text = love.graphics.newText(love.graphics.getFont(), msg)
+lurker.postswap = function(f)
+    print("Reloaded: " .. f)
+    love.load()
+end
+
+local pos
+
+function love.load()
     pos = {
         x = 50,
         y = 50,
@@ -12,10 +17,12 @@ function love.load(args)
 end
 
 function love.draw()
-    love.graphics.draw(text, pos.x, pos.y)
+    love.graphics.draw(love.graphics.newText(love.graphics.getFont(), "Hello World"), pos.x, pos.y)
 end
 
 function love.update(dt)
+    lurker.update()
+
     local speed = 100
     local move = speed * dt
 

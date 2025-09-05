@@ -54,8 +54,14 @@ ls game/**/*.lua | entr -r love game/
 watchman-make -p 'game/**/*.lua' --run 'love game/'
 ```
 
-### Testing
+### Testing & Linting
 ```bash
+# Run luacheck for linting
+luacheck game/
+
+# Run luacheck on specific file
+luacheck game/main.lua
+
 # Run automated tests (if using Busted)
 cd game && busted
 
