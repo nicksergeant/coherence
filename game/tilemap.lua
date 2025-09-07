@@ -1,6 +1,6 @@
 local tilemap = {}
 
-tilemap.tileSize = 80
+tilemap.tileSize = 128
 tilemap.mapWidth = 96
 tilemap.mapHeight = 40
 tilemap.tiles = {}
@@ -10,6 +10,7 @@ tilemap.scaleY = 1
 
 function tilemap.init()
     tilemap.grassImage = love.graphics.newImage("assets/tiles/grass.png")
+    tilemap.grassImage:setFilter("nearest", "nearest")
     tilemap.scaleX = tilemap.tileSize / tilemap.grassImage:getWidth()
     tilemap.scaleY = tilemap.tileSize / tilemap.grassImage:getHeight()
 
@@ -47,5 +48,6 @@ function tilemap.draw(cameraX, cameraY)
         end
     end
 end
+
 
 return tilemap
