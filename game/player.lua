@@ -1,10 +1,22 @@
 local player = {}
 
+local RUN_SPEED = 250
+local WALK_SPEED = 125
+
+local BOB_SPEED = 17.5
+local BOB_HEIGHT = 2.5
+
+local DIAGONAL_FACTOR = 0.707
+
+local SHADOW_WIDTH = 26
+local SHADOW_HEIGHT = 8
+local SHADOW_OFFSET_Y = 1
+
 player.x = 750
 player.y = 400
 player.width = 32
 player.height = 40
-player.speed = 200
+player.speed = RUN_SPEED
 player.direction = "down"
 player.sprites = {}
 player.spriteScale = 2
@@ -37,15 +49,15 @@ function player.addToWorld(world)
 end
 
 function player.update(dt, worldWidth, worldHeight)
+    -- Determine movement speed (walk vs run)
     local speed = player.speed
-
     ---@diagnostic disable-next-line: param-type-mismatch
     if love.keyboard.isDown("rshift") or love.keyboard.isDown("lshift") then
-        speed = 100
+        speed = WALK_SPEED
     end
 
+    -- Get keyboard input
     local dx, dy = 0, 0
-
     if love.keyboard.isDown("a") then
         dx = -1
     end
@@ -59,6 +71,7 @@ function player.update(dt, worldWidth, worldHeight)
         dy = 1
     end
 
+    -- Update sprite direction
     if dx < 0 then
         player.direction = "left"
     elseif dx > 0 then
@@ -69,11 +82,13 @@ function player.update(dt, worldWidth, worldHeight)
         player.direction = "down"
     end
 
+    -- Normalize diagonal movement
     if dx ~= 0 and dy ~= 0 then
-        dx = dx * 0.707
-        dy = dy * 0.707
+        dx = dx * DIAGONAL_FACTOR
+        dy = dy * DIAGONAL_FACTOR
     end
 
+    -- Calculate movement with collision detection
     local goalX = player.x + dx * speed * dt
     local goalY = player.y + dy * speed * dt
 
@@ -84,14 +99,26 @@ function player.update(dt, worldWidth, worldHeight)
 
     player.x = actualX
     player.y = actualY
-
     player.collisions = cols
     player.collisionCount = len
 
+    -- Update bobbing animation
     player.isMoving = (dx ~= 0 or dy ~= 0)
     if player.isMoving then
-        player.bobTime = player.bobTime + dt * 12
-        player.bobOffset = math.sin(player.bobTime) * 2
+        player.bobTime = player.bobTime + dt * BOB_SPEED
+
+        local bobCycle = player.bobTime % (math.pi * 2)
+        local quarterCycle = math.pi / 2
+
+        if bobCycle < quarterCycle * 0.3 or bobCycle > math.pi * 2 - quarterCycle * 0.3 then
+            player.bobOffset = 0
+        elseif bobCycle < math.pi - quarterCycle * 0.3 then
+            player.bobOffset = BOB_HEIGHT
+        elseif bobCycle < math.pi + quarterCycle * 0.3 then
+            player.bobOffset = 0
+        else
+            player.bobOffset = -BOB_HEIGHT
+        end
     else
         player.bobTime = 0
         player.bobOffset = 0
@@ -103,21 +130,31 @@ function player.draw()
         return
     end
 
+    -- Determine which sprite to use
     local spriteKey = player.direction
     if player.useGirlSprites then
         spriteKey = player.direction .. "_girl"
     end
 
     local currentSprite = player.sprites[spriteKey]
+
     if currentSprite then
         local drawY = player.y + player.bobOffset
         local spriteHeight = currentSprite:getHeight() * player.spriteScale
-
-        love.graphics.setColor(0, 0, 0, 0.5)
         local spriteWidth = currentSprite:getWidth() * player.spriteScale
-        love.graphics.ellipse("fill", player.x + spriteWidth / 2, player.y + spriteHeight + 1, 26, 8)
 
+        -- Draw shadow
+        love.graphics.setColor(0, 0, 0, 0.5)
+        love.graphics.ellipse(
+            "fill",
+            player.x + spriteWidth / 2,
+            player.y + spriteHeight + SHADOW_OFFSET_Y,
+            SHADOW_WIDTH,
+            SHADOW_HEIGHT
+        )
         love.graphics.setColor(1, 1, 1, 1)
+
+        -- Draw sprite
         love.graphics.draw(currentSprite, player.x, drawY, 0, player.spriteScale, player.spriteScale)
     end
 end
