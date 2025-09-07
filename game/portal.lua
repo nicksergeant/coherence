@@ -17,21 +17,19 @@ function portal.init()
 end
 
 function portal.addToWorld(world)
-    -- Portal sprite has transparent areas, adjust collision to match visible part
-    local portalSolidX = portal.x + portal.width * 0.15  -- Offset from left
-    local portalSolidY = portal.y + portal.height * 0.15  -- Offset from top
-    local portalSolidWidth = portal.width * 0.7  -- Narrower to match sprite
-    local portalSolidHeight = portal.height * 0.6  -- Just the top solid part
+    local portalSolidX = portal.x + portal.width * 0.15
+    local portalSolidY = portal.y + portal.height * 0.15
+    local portalSolidWidth = portal.width * 0.7
+    local portalSolidHeight = portal.height * 0.6
 
     world:add(portal, portalSolidX, portalSolidY, portalSolidWidth, portalSolidHeight)
 
     portal.doorTrigger = { type = "portalDoor", parent = portal }
 
-    -- Door is at the bottom center of the sprite
     local doorWidth = portal.width * 0.25
     local doorHeight = portal.height * 0.2
-    local doorX = portal.x + portal.width * 0.375  -- Center the door
-    local doorY = portal.y + portal.height * 0.75  -- Bottom portion
+    local doorX = portal.x + portal.width * 0.375
+    local doorY = portal.y + portal.height * 0.75
 
     world:add(portal.doorTrigger, doorX, doorY, doorWidth, doorHeight)
 end
