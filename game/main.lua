@@ -1,6 +1,9 @@
 local lurker = require("lib.lurker")
+local bump = require("lib.bump")
 
 local game = {}
+game.world = nil
+game.debug = false
 
 local function loadModules()
     package.loaded.player = nil
@@ -19,10 +22,15 @@ local function initializeGame(keepPlayerPosition)
     game.player.init()
     game.portal.init()
 
+    game.world = bump.newWorld(64)
+
     if not keepPlayerPosition then
         game.player.x = love.graphics.getWidth() / 2
         game.player.y = love.graphics.getHeight() / 2
     end
+
+    game.player.addToWorld(game.world)
+    game.portal.addToWorld(game.world)
 
     game.worldWidth = game.tilemap.mapWidth * game.tilemap.tileSize
     game.worldHeight = game.tilemap.mapHeight * game.tilemap.tileSize
@@ -61,47 +69,36 @@ function love.draw()
     game.tilemap.draw(game.camera.x, game.camera.y)
     game.portal.draw()
     game.player.draw()
+
+    if game.debug and game.world then
+        love.graphics.setColor(1, 0, 0, 0.5)
+        local items, len = game.world:getItems()
+        for i = 1, len do
+            local item = items[i]
+            local x, y, w, h = game.world:getRect(item)
+            love.graphics.rectangle("line", x, y, w, h)
+
+            if item.type == "portalDoor" then
+                love.graphics.setColor(0, 1, 0, 0.5)
+                love.graphics.rectangle("fill", x, y, w, h)
+                love.graphics.setColor(1, 0, 0, 0.5)
+            end
+        end
+        love.graphics.setColor(1, 1, 1, 1)
+    end
 end
 
 function love.update(dt)
     lurker.update()
     game.player.update(dt, game.worldWidth, game.worldHeight)
-    
-    local portalCollision = game.portal.checkCollision(game.player)
-    if portalCollision == "blocked" then
-        local originalX = game.player.x
-        local originalY = game.player.y
-        
-        -- Check if we were inside the portal before being blocked
-        game.player.x = game.player.prevX
-        game.player.y = game.player.prevY
-        local wasInside = game.portal.checkCollision(game.player) == "inside" or game.portal.checkCollision(game.player) == "enter"
-        game.player.x = originalX
-        game.player.y = originalY
-        
-        -- Try moving only horizontally
-        game.player.y = game.player.prevY
-        if game.portal.checkCollision(game.player) ~= "blocked" then
-            -- Horizontal movement is OK, keep it
-        else
-            -- Horizontal blocked, try only vertical
-            game.player.x = game.player.prevX
-            game.player.y = originalY
-            if game.portal.checkCollision(game.player) == "blocked" then
-                -- Both blocked, restore position
-                game.player.x = game.player.prevX
-                game.player.y = game.player.prevY
-            end
-        end
-        
-        -- Keep player hidden if they were inside and hit an internal wall
-        game.player.isInPortal = wasInside
-    elseif portalCollision == "enter" or portalCollision == "inside" then
-        game.player.isInPortal = true
-    else
-        game.player.isInPortal = false
-    end
-    
+    game.portal.update(dt, game.player)
     game.camera.update(game.player, game.worldWidth, game.worldHeight)
-    game.portal.update(dt)
+end
+
+function love.keypressed(key)
+    if key == "f1" then
+        game.debug = not game.debug
+    elseif key == "f2" then
+        game.player.useGirlSprites = not game.player.useGirlSprites
+    end
 end

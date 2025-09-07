@@ -16,9 +16,43 @@ function portal.init()
     portal.height = portal.sprite:getHeight() * portal.spriteScale
 end
 
-function portal.update(dt)
+function portal.addToWorld(world)
+    -- Portal sprite has transparent areas, adjust collision to match visible part
+    local portalSolidX = portal.x + portal.width * 0.15  -- Offset from left
+    local portalSolidY = portal.y + portal.height * 0.15  -- Offset from top
+    local portalSolidWidth = portal.width * 0.7  -- Narrower to match sprite
+    local portalSolidHeight = portal.height * 0.6  -- Just the top solid part
+
+    world:add(portal, portalSolidX, portalSolidY, portalSolidWidth, portalSolidHeight)
+
+    portal.doorTrigger = { type = "portalDoor", parent = portal }
+
+    -- Door is at the bottom center of the sprite
+    local doorWidth = portal.width * 0.25
+    local doorHeight = portal.height * 0.2
+    local doorX = portal.x + portal.width * 0.375  -- Center the door
+    local doorY = portal.y + portal.height * 0.75  -- Bottom portion
+
+    world:add(portal.doorTrigger, doorX, doorY, doorWidth, doorHeight)
+end
+
+function portal.update(dt, player)
     portal.pulseTime = portal.pulseTime + dt * 2
     portal.glowRadius = 25 + math.sin(portal.pulseTime) * 5
+
+    if player.collisions then
+        for i = 1, player.collisionCount do
+            local col = player.collisions[i]
+            if col.other == portal.doorTrigger then
+                player.insideObject = portal
+                return
+            end
+        end
+    end
+
+    if player.insideObject == portal then
+        player.insideObject = nil
+    end
 end
 
 function portal.draw()
@@ -33,46 +67,6 @@ function portal.draw()
     end
 
     love.graphics.pop()
-end
-
-function portal.checkCollision(player)
-    local px = player.x
-    local py = player.y
-    local pw = player.width
-    local ph = player.height
-
-    -- Adjust collision box to account for transparent areas
-    local portalLeft = portal.x + portal.width * 0
-    local portalRight = portal.x + portal.width * 0.83
-    local portalTop = portal.y - portal.height * 0.155
-    local portalBottom = portal.y + portal.height - 100
-
-    if px < portalRight and px + pw > portalLeft and py < portalBottom and py + ph > portalTop then
-        local doorLeft = portal.x + portal.width * 0.35
-        local doorRight = portal.x + portal.width * 0.65
-        local doorTop = portal.y + portal.height * 0.7
-
-        -- Check if player center is in the door area
-        local playerCenterX = px + pw / 2
-        local playerCenterY = py + ph / 2
-
-        if playerCenterX >= doorLeft and playerCenterX <= doorRight and py + ph >= doorTop then
-            -- Player is at the door entrance or already inside
-            return "enter"
-        elseif
-            playerCenterY >= portalTop
-            and playerCenterY <= portalBottom
-            and playerCenterX >= portalLeft
-            and playerCenterX <= portalRight
-        then
-            -- Player is already inside the portal area, keep them hidden
-            return "inside"
-        else
-            return "blocked"
-        end
-    end
-
-    return false
 end
 
 return portal
