@@ -14,8 +14,14 @@ local SHADOW_OFFSET_Y = 1
 
 player.x = 750
 player.y = 400
-player.width = 32
-player.height = 40
+player.width = 48
+player.height = 48
+player.collisionBox = {
+    width = 67,
+    height = 48,
+    offsetX = 13,
+    offsetY = 56,
+}
 player.speed = RUN_SPEED
 player.direction = "down"
 player.sprites = {}
@@ -44,7 +50,13 @@ function player.init()
 end
 
 function player.addToWorld(world)
-    world:add(player, player.x, player.y, player.width, player.height)
+    world:add(
+        player,
+        player.x + player.collisionBox.offsetX,
+        player.y + player.collisionBox.offsetY,
+        player.collisionBox.width,
+        player.collisionBox.height
+    )
     player.world = world
 end
 
@@ -89,13 +101,19 @@ function player.update(dt, worldWidth, worldHeight)
     local goalX = player.x + dx * speed * dt
     local goalY = player.y + dy * speed * dt
 
-    goalX = math.max(0, math.min(goalX, worldWidth - player.width))
-    goalY = math.max(0, math.min(goalY, worldHeight - player.height))
+    -- Calculate collision box goal position
+    local collisionGoalX = goalX + player.collisionBox.offsetX
+    local collisionGoalY = goalY + player.collisionBox.offsetY
 
-    local actualX, actualY, cols, len = player.world:move(player, goalX, goalY)
+    -- Clamp to world bounds
+    collisionGoalX = math.max(0, math.min(collisionGoalX, worldWidth - player.collisionBox.width))
+    collisionGoalY = math.max(0, math.min(collisionGoalY, worldHeight - player.collisionBox.height))
 
-    player.x = actualX
-    player.y = actualY
+    local actualX, actualY, cols, len = player.world:move(player, collisionGoalX, collisionGoalY)
+
+    -- Update sprite position from collision box position
+    player.x = actualX - player.collisionBox.offsetX
+    player.y = actualY - player.collisionBox.offsetY
     player.collisions = cols
     player.collisionCount = len
 

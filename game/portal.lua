@@ -1,47 +1,51 @@
 local portal = {}
 
-local SPRITE_SCALE = 2
-
-local SOLID_OFFSET_X = 0.15
-local SOLID_OFFSET_Y = 0.15
-local SOLID_WIDTH_FACTOR = 0.7
-local SOLID_HEIGHT_FACTOR = 0.6
-
-local DOOR_WIDTH_FACTOR = 0.25
-local DOOR_HEIGHT_FACTOR = 0.2
-local DOOR_OFFSET_X = 0.375
-local DOOR_OFFSET_Y = 0.75
-
 portal.x = 1500
 portal.y = 800
-portal.width = 64
-portal.height = 64
+portal.width = 192
+portal.height = 192
 portal.sprite = nil
-portal.spriteScale = SPRITE_SCALE
+portal.spriteScale = 2
+
+portal.collisionBox = {
+    width = 285,
+    height = 336,
+    offsetX = 49,
+    offsetY = 3,
+}
+
+portal.doorTrigger = {
+    type = "portalDoor",
+    parent = portal,
+    width = 101,
+    height = 77,
+    offsetX = 141,
+    offsetY = 305,
+}
 
 function portal.init()
     portal.sprite = love.graphics.newImage("assets/sprites/portal.png")
     portal.sprite:setFilter("nearest", "nearest")
-    portal.width = portal.sprite:getWidth() * portal.spriteScale
-    portal.height = portal.sprite:getHeight() * portal.spriteScale
 end
 
 function portal.addToWorld(world)
-    local portalSolidX = portal.x + portal.width * SOLID_OFFSET_X
-    local portalSolidY = portal.y + portal.height * SOLID_OFFSET_Y
-    local portalSolidWidth = portal.width * SOLID_WIDTH_FACTOR
-    local portalSolidHeight = portal.height * SOLID_HEIGHT_FACTOR
+    -- Main collision box
+    world:add(
+        portal,
+        portal.x + portal.collisionBox.offsetX,
+        portal.y + portal.collisionBox.offsetY,
+        portal.collisionBox.width,
+        portal.collisionBox.height
+    )
 
-    world:add(portal, portalSolidX, portalSolidY, portalSolidWidth, portalSolidHeight)
-
-    portal.doorTrigger = { type = "portalDoor", parent = portal }
-
-    local doorWidth = portal.width * DOOR_WIDTH_FACTOR
-    local doorHeight = portal.height * DOOR_HEIGHT_FACTOR
-    local doorX = portal.x + portal.width * DOOR_OFFSET_X
-    local doorY = portal.y + portal.height * DOOR_OFFSET_Y
-
-    world:add(portal.doorTrigger, doorX, doorY, doorWidth, doorHeight)
+    -- Door trigger zone
+    world:add(
+        portal.doorTrigger,
+        portal.x + portal.doorTrigger.offsetX,
+        portal.y + portal.doorTrigger.offsetY,
+        portal.doorTrigger.width,
+        portal.doorTrigger.height
+    )
 end
 
 function portal.update(_, player)
