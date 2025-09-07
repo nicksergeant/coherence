@@ -41,13 +41,32 @@ function portal.checkCollision(player)
     local pw = player.width
     local ph = player.height
 
-    if px < portal.x + portal.width and px + pw > portal.x and py < portal.y + portal.height and py + ph > portal.y then
-        local doorLeft = portal.x + portal.width * 0.4
-        local doorRight = portal.x + portal.width * 0.6
-        local doorTop = portal.y + portal.height * 0.8
+    -- Adjust collision box to account for transparent areas
+    local portalLeft = portal.x + portal.width * 0
+    local portalRight = portal.x + portal.width * 0.83
+    local portalTop = portal.y - portal.height * 0.155
+    local portalBottom = portal.y + portal.height - 100
 
-        if px + pw / 2 >= doorLeft and px + pw / 2 <= doorRight and py + ph >= doorTop then
+    if px < portalRight and px + pw > portalLeft and py < portalBottom and py + ph > portalTop then
+        local doorLeft = portal.x + portal.width * 0.35
+        local doorRight = portal.x + portal.width * 0.65
+        local doorTop = portal.y + portal.height * 0.7
+
+        -- Check if player center is in the door area
+        local playerCenterX = px + pw / 2
+        local playerCenterY = py + ph / 2
+
+        if playerCenterX >= doorLeft and playerCenterX <= doorRight and py + ph >= doorTop then
+            -- Player is at the door entrance or already inside
             return "enter"
+        elseif
+            playerCenterY >= portalTop
+            and playerCenterY <= portalBottom
+            and playerCenterX >= portalLeft
+            and playerCenterX <= portalRight
+        then
+            -- Player is already inside the portal area, keep them hidden
+            return "inside"
         else
             return "blocked"
         end

@@ -69,10 +69,34 @@ function love.update(dt)
     
     local portalCollision = game.portal.checkCollision(game.player)
     if portalCollision == "blocked" then
+        local originalX = game.player.x
+        local originalY = game.player.y
+        
+        -- Check if we were inside the portal before being blocked
         game.player.x = game.player.prevX
         game.player.y = game.player.prevY
-        game.player.isInPortal = false
-    elseif portalCollision == "enter" then
+        local wasInside = game.portal.checkCollision(game.player) == "inside" or game.portal.checkCollision(game.player) == "enter"
+        game.player.x = originalX
+        game.player.y = originalY
+        
+        -- Try moving only horizontally
+        game.player.y = game.player.prevY
+        if game.portal.checkCollision(game.player) ~= "blocked" then
+            -- Horizontal movement is OK, keep it
+        else
+            -- Horizontal blocked, try only vertical
+            game.player.x = game.player.prevX
+            game.player.y = originalY
+            if game.portal.checkCollision(game.player) == "blocked" then
+                -- Both blocked, restore position
+                game.player.x = game.player.prevX
+                game.player.y = game.player.prevY
+            end
+        end
+        
+        -- Keep player hidden if they were inside and hit an internal wall
+        game.player.isInPortal = wasInside
+    elseif portalCollision == "enter" or portalCollision == "inside" then
         game.player.isInPortal = true
     else
         game.player.isInPortal = false
