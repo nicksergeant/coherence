@@ -1,6 +1,10 @@
 local lurker = require("lib.lurker")
 local bump = require("lib.bump")
 
+local BUMP_CELL_SIZE = 64
+local DEBUG_COLOR = { 1, 0, 0, 0.5 }
+local PORTAL_DOOR_COLOR = { 0, 1, 0, 0.5 }
+
 local game = {}
 game.world = nil
 game.debug = false
@@ -22,7 +26,7 @@ local function initializeGame(keepPlayerPosition)
     game.player.init()
     game.portal.init()
 
-    game.world = bump.newWorld(64)
+    game.world = bump.newWorld(BUMP_CELL_SIZE)
 
     if not keepPlayerPosition then
         game.player.x = love.graphics.getWidth() / 2
@@ -70,20 +74,23 @@ function love.draw()
     game.portal.draw()
     game.player.draw()
 
+    -- Debug visualization
     if game.debug and game.world then
-        love.graphics.setColor(1, 0, 0, 0.5)
+        love.graphics.setColor(DEBUG_COLOR)
         local items, len = game.world:getItems()
+
         for i = 1, len do
             local item = items[i]
             local x, y, w, h = game.world:getRect(item)
             love.graphics.rectangle("line", x, y, w, h)
 
             if item.type == "portalDoor" then
-                love.graphics.setColor(0, 1, 0, 0.5)
+                love.graphics.setColor(PORTAL_DOOR_COLOR)
                 love.graphics.rectangle("fill", x, y, w, h)
-                love.graphics.setColor(1, 0, 0, 0.5)
+                love.graphics.setColor(DEBUG_COLOR)
             end
         end
+
         love.graphics.setColor(1, 1, 1, 1)
     end
 end

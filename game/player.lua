@@ -49,14 +49,13 @@ function player.addToWorld(world)
 end
 
 function player.update(dt, worldWidth, worldHeight)
-    -- Determine movement speed (walk vs run)
+    -- Movement input and speed
     local speed = player.speed
     ---@diagnostic disable-next-line: param-type-mismatch
     if love.keyboard.isDown("rshift") or love.keyboard.isDown("lshift") then
         speed = WALK_SPEED
     end
 
-    -- Get keyboard input
     local dx, dy = 0, 0
     if love.keyboard.isDown("a") then
         dx = -1
@@ -71,7 +70,6 @@ function player.update(dt, worldWidth, worldHeight)
         dy = 1
     end
 
-    -- Update sprite direction
     if dx < 0 then
         player.direction = "left"
     elseif dx > 0 then
@@ -82,13 +80,12 @@ function player.update(dt, worldWidth, worldHeight)
         player.direction = "down"
     end
 
-    -- Normalize diagonal movement
     if dx ~= 0 and dy ~= 0 then
         dx = dx * DIAGONAL_FACTOR
         dy = dy * DIAGONAL_FACTOR
     end
 
-    -- Calculate movement with collision detection
+    -- Movement and collision
     local goalX = player.x + dx * speed * dt
     local goalY = player.y + dy * speed * dt
 
@@ -102,7 +99,7 @@ function player.update(dt, worldWidth, worldHeight)
     player.collisions = cols
     player.collisionCount = len
 
-    -- Update bobbing animation
+    -- Bobbing animation
     player.isMoving = (dx ~= 0 or dy ~= 0)
     if player.isMoving then
         player.bobTime = player.bobTime + dt * BOB_SPEED
@@ -130,7 +127,6 @@ function player.draw()
         return
     end
 
-    -- Determine which sprite to use
     local spriteKey = player.direction
     if player.useGirlSprites then
         spriteKey = player.direction .. "_girl"
@@ -143,7 +139,7 @@ function player.draw()
         local spriteHeight = currentSprite:getHeight() * player.spriteScale
         local spriteWidth = currentSprite:getWidth() * player.spriteScale
 
-        -- Draw shadow
+        -- Shadow
         love.graphics.setColor(0, 0, 0, 0.5)
         love.graphics.ellipse(
             "fill",
@@ -154,7 +150,6 @@ function player.draw()
         )
         love.graphics.setColor(1, 1, 1, 1)
 
-        -- Draw sprite
         love.graphics.draw(currentSprite, player.x, drawY, 0, player.spriteScale, player.spriteScale)
     end
 end

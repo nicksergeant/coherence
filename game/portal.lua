@@ -1,13 +1,23 @@
 local portal = {}
 
+local SPRITE_SCALE = 2
+
+local SOLID_OFFSET_X = 0.15
+local SOLID_OFFSET_Y = 0.15
+local SOLID_WIDTH_FACTOR = 0.7
+local SOLID_HEIGHT_FACTOR = 0.6
+
+local DOOR_WIDTH_FACTOR = 0.25
+local DOOR_HEIGHT_FACTOR = 0.2
+local DOOR_OFFSET_X = 0.375
+local DOOR_OFFSET_Y = 0.75
+
 portal.x = 1500
 portal.y = 800
 portal.width = 64
 portal.height = 64
 portal.sprite = nil
-portal.spriteScale = 2
-portal.pulseTime = 0
-portal.glowRadius = 0
+portal.spriteScale = SPRITE_SCALE
 
 function portal.init()
     portal.sprite = love.graphics.newImage("assets/sprites/portal.png")
@@ -17,27 +27,24 @@ function portal.init()
 end
 
 function portal.addToWorld(world)
-    local portalSolidX = portal.x + portal.width * 0.15
-    local portalSolidY = portal.y + portal.height * 0.15
-    local portalSolidWidth = portal.width * 0.7
-    local portalSolidHeight = portal.height * 0.6
+    local portalSolidX = portal.x + portal.width * SOLID_OFFSET_X
+    local portalSolidY = portal.y + portal.height * SOLID_OFFSET_Y
+    local portalSolidWidth = portal.width * SOLID_WIDTH_FACTOR
+    local portalSolidHeight = portal.height * SOLID_HEIGHT_FACTOR
 
     world:add(portal, portalSolidX, portalSolidY, portalSolidWidth, portalSolidHeight)
 
     portal.doorTrigger = { type = "portalDoor", parent = portal }
 
-    local doorWidth = portal.width * 0.25
-    local doorHeight = portal.height * 0.2
-    local doorX = portal.x + portal.width * 0.375
-    local doorY = portal.y + portal.height * 0.75
+    local doorWidth = portal.width * DOOR_WIDTH_FACTOR
+    local doorHeight = portal.height * DOOR_HEIGHT_FACTOR
+    local doorX = portal.x + portal.width * DOOR_OFFSET_X
+    local doorY = portal.y + portal.height * DOOR_OFFSET_Y
 
     world:add(portal.doorTrigger, doorX, doorY, doorWidth, doorHeight)
 end
 
-function portal.update(dt, player)
-    portal.pulseTime = portal.pulseTime + dt * 2
-    portal.glowRadius = 25 + math.sin(portal.pulseTime) * 5
-
+function portal.update(_, player)
     if player.collisions then
         for i = 1, player.collisionCount do
             local col = player.collisions[i]
@@ -54,17 +61,7 @@ function portal.update(dt, player)
 end
 
 function portal.draw()
-    love.graphics.push()
-
-    love.graphics.setColor(0.5, 0, 1, 0.2)
-    love.graphics.circle("fill", portal.x + portal.width / 2, portal.y + portal.height / 2, portal.glowRadius)
-
-    love.graphics.setColor(1, 1, 1, 1)
-    if portal.sprite then
-        love.graphics.draw(portal.sprite, portal.x, portal.y, 0, portal.spriteScale, portal.spriteScale)
-    end
-
-    love.graphics.pop()
+    love.graphics.draw(portal.sprite, portal.x, portal.y, 0, portal.spriteScale, portal.spriteScale)
 end
 
 return portal
