@@ -41,21 +41,25 @@ love --version
 
 ### Running the Game
 ```bash
-# Run the game
-love game/
+# IMPORTANT: Do NOT try to run the game with `love game/` in Claude Code
+# The user runs the game with hot reload enabled in a separate terminal
 
-# Run with console visible (debugging)
-love game/ --console
-
+# If the user needs to run the game:
 # Run with hot reload (using entr)
 ls game/**/*.lua | entr -r love game/
 
 # Run with hot reload (using watchman)
 watchman-make -p 'game/**/*.lua' --run 'love game/'
+
+# Run with console visible (debugging)
+love game/ --console
 ```
 
 ### Testing & Linting
 ```bash
+# IMPORTANT: Do NOT try to run the game with `love game/` in Claude Code
+# The user runs the game with hot reload enabled in a separate terminal
+
 # Run luacheck for linting
 luacheck game/
 
@@ -64,9 +68,6 @@ luacheck game/main.lua
 
 # Run automated tests (if using Busted)
 cd game && busted
-
-# Run with debug mode
-DEBUG=true love game/
 ```
 
 ### Distribution
@@ -302,7 +303,9 @@ After implementation, test it, mark it complete, and update Current Focus sectio
 1. **NEVER modify Tiled map files** (.lua exports from Tiled)
 2. **ALWAYS use constants.lua** for magic numbers
 3. **ALWAYS add logging** for state changes
-4. **IMMEDIATELY test** after implementing features
-5. **Check Tasks.md** before starting new work
-6. **Update Tasks.md** after completing work
-7. **Reference Examples.md** for implementation patterns
+4. **NEVER run `love game/` to test** - user has hot reload running
+5. **ALWAYS run `luacheck` after code changes** to catch Lua errors
+6. **Verify code changes** are correct without running the game
+7. **Check Tasks.md** before starting new work
+8. **Update Tasks.md** after completing work
+9. **Reference Examples.md** for implementation patterns

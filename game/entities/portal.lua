@@ -28,8 +28,8 @@ function portal.init()
 end
 
 function portal.onInteract()
-    print("Entering portal... (TODO: load interior map)")
-    -- TODO: Load interior tilemap and move player inside
+    local room_manager = require("room_manager")
+    room_manager.switch("portal_interior", { fromRoom = "overworld" })
 end
 
 function portal.addToWorld(world)
