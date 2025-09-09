@@ -1,21 +1,26 @@
 # Coherence
 
-A learning project to explore Lua, Love2D, and game development by building a top-down pixel art game about jumping between parallel universes.
+A top-down pixel art game about jumping between parallel universes, inspired by "Dark Matter" by Blake Crouch. Built with Love2D as a learning project for Lua and game development.
 
-## What I'm Learning
+## Current Status
 
-- **Lua** - My first time with this language
-- **Love2D** - Learning game development fundamentals 
-- **Game Design** - Understanding game loops, collision, rendering
-- **Procedural Generation** - Creating infinite worlds
+✅ **Playable Alpha** - Core gameplay loop complete with universe jumping, timers, and game over mechanics.
 
-## The Game
+### What's Working
 
-Inspired by "Dark Matter" by Blake Crouch. You control a quantum device to jump between procedurally generated universes - from utopias to dystopias. Each jump is unique.
+- **Universe System** - Three distinct universes (Utopian, Neutral, Dystopian) with unique mechanics
+- **Portal Mechanic** - Enter the mysterious box to randomly jump between universes
+- **Timer Challenges** - Each universe has different time limits to find your way back
+- **Visual Effects** - Screen shake, thought bubbles, directional arrows
+- **Game Over/Restart** - Full game loop with restart functionality
+- **Procedural Positioning** - Portal and player randomly positioned after each jump
 
-## Status
+### What I've Learned So Far
 
-🚧 Early learning phase - currently setting up Love2D and learning the basics.
+- **Lua** - Tables, metatables, module system, 1-indexing
+- **Love2D** - Game loops, collision detection (Bump), camera systems
+- **Game Architecture** - Room management, entity systems, state machines
+- **Visual Feedback** - Screen effects, UI overlays, sprite handling
 
 ## Running
 

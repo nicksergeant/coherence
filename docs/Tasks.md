@@ -1,45 +1,45 @@
 # Development Tasks
 
-Track development progress by marking tasks complete. The LLM should update this file as tasks are completed.
+Track development progress by marking tasks complete.
 
 ## Phase 0: Environment Setup ✅
 - [x] Install Love2D
 - [x] Create project structure
 - [x] Set up documentation
-- [ ] Create basic Love2D window
-- [ ] Add conf.lua with window settings
-- [ ] Verify hot reload with lurker
+- [x] Create basic Love2D window
+- [x] Add conf.lua with window settings
+- [x] Verify hot reload with lurker
 
-## Phase 1: Core Game Loop
-- [ ] Implement love.load, love.update, love.draw
-- [ ] Add FPS counter in debug mode
-- [ ] Create constants.lua file
-- [ ] Add logging system for debugging
-- [ ] Test with "Hello World" text
+## Phase 1: Core Game Loop ✅
+- [x] Implement love.load, love.update, love.draw
+- [x] Add FPS counter in debug mode
+- [x] Create constants.lua file
+- [x] Add logging system for debugging
+- [x] Test with basic game
 
-## Phase 2: Player Movement
-- [ ] Draw player as colored rectangle (32x32)
-- [ ] Implement WASD keyboard input
-- [ ] Add player position and speed
-- [ ] Frame-independent movement with dt
-- [ ] Add screen boundaries
-- [ ] Log player position changes
+## Phase 2: Player Movement ✅
+- [x] Draw player with sprites
+- [x] Implement WASD keyboard input
+- [x] Add player position and speed
+- [x] Frame-independent movement with dt
+- [x] Add world boundaries
+- [x] Walk/run with shift key
 
-## Phase 3: Tilemap System
-- [ ] Install Tiled map editor
-- [ ] Create test map (5x5 chunks, 10x10 tiles each)
-- [ ] Export map as Lua file
-- [ ] Integrate STI library
-- [ ] Load and render tilemap
-- [ ] Add camera following player
+## Phase 3: Room & Entity System ✅
+- [x] Create room manager for transitions
+- [x] Implement entity system
+- [x] Add portal entity with interactions
+- [x] Create portal interior room
+- [x] Add fade transitions between rooms
+- [x] Implement Y-sorted rendering
 
-## Phase 4: Collision Detection
-- [ ] Integrate Bump library
-- [ ] Add player to collision world
-- [ ] Define wall tiles as solid
-- [ ] Implement collision response
-- [ ] Test collision at different speeds
-- [ ] Add debug collision box visualization
+## Phase 4: Collision Detection ✅
+- [x] Integrate Bump library
+- [x] Add player to collision world
+- [x] Add portal collision boxes
+- [x] Implement collision response
+- [x] Test collision at different speeds
+- [x] Add debug collision box visualization
 
 ## Phase 5: Chunk System
 - [ ] Implement chunk data structure
@@ -92,15 +92,22 @@ Track development progress by marking tasks complete. The LLM should update this
 - [ ] Package for distribution
 
 ## Current Focus
-**Active Task:** Create basic Love2D window
+**Active Task:** Import constants and continue polish
 
 ## Completed Milestones
-- Documentation system created
-- Tech stack decided (Love2D + Lua)
-- Game design documented
+- ✅ Playable game with core mechanics
+- ✅ Three universe system with unique mechanics  
+- ✅ Portal jumping with random positioning
+- ✅ Timer challenges and game over system
+- ✅ Visual feedback (arrows, shake, thought bubbles)
+- ✅ Complete game loop with restart
+- ✅ Code cleanup and documentation update
 
-## Bugs to Fix
-- [ ] (None yet)
+## Recent Bug Fixes
+- [x] Fixed arrow directions being inverted
+- [x] Fixed player position not updating (wrong entity reference)
+- [x] Fixed portal position persistence across jumps
+- [x] Fixed collision world update issues
 
 ## Performance Goals
 - [ ] Maintain 60 FPS with 25 chunks loaded
