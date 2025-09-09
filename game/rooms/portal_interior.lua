@@ -8,6 +8,7 @@ portal_interior.worldWidth = 0
 portal_interior.worldHeight = 0
 
 local camera = require("camera")
+local room_manager = require("room_manager")
 
 local BUMP_CELL_SIZE = 64
 local TILE_SIZE = 32
@@ -29,7 +30,7 @@ for y = 1, MAP_HEIGHT do
     end
 end
 
-function portal_interior:enter(player)
+function portal_interior:enter(player, transitionData)
     self.world = bump.newWorld(BUMP_CELL_SIZE)
 
     player.x = love.graphics.getWidth() / 2 - player.width / 2
@@ -41,6 +42,9 @@ function portal_interior:enter(player)
     self.worldHeight = MAP_HEIGHT * TILE_SIZE
 
     camera.init(player, self.worldWidth, self.worldHeight)
+
+    -- Remember which universe we came from
+    self.sourceUniverse = transitionData.fromUniverse or "utopian"
 end
 
 function portal_interior:exit()
@@ -62,7 +66,7 @@ function portal_interior:draw()
         entity.draw()
     end
 
-    self:drawExitPrompt()
+    self:drawUI()
 end
 
 function portal_interior.drawTilemap(_, cameraX, cameraY)
@@ -85,7 +89,17 @@ function portal_interior.drawTilemap(_, cameraX, cameraY)
     love.graphics.setColor(1, 1, 1, 1)
 end
 
-function portal_interior:drawExitPrompt()
+function portal_interior:drawUI()
+    love.graphics.push()
+    love.graphics.origin()
+
+    -- Instructions
+    love.graphics.setColor(0, 0, 0, 0.7)
+    love.graphics.rectangle("fill", love.graphics.getWidth() / 2 - 100, love.graphics.getHeight() / 2, 200, 30)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.print("Press SPACE to jump", love.graphics.getWidth() / 2 - 95, love.graphics.getHeight() / 2 + 5)
+
+    -- Exit prompt
     local player = self.entities[1]
     if player and player.y > love.graphics.getHeight() - 200 then
         local screenWidth = love.graphics.getWidth()
@@ -94,12 +108,27 @@ function portal_interior:drawExitPrompt()
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.print("Press X to Exit", screenWidth / 2 - 48, love.graphics.getHeight() - 78)
     end
+
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.pop()
 end
 
 function portal_interior.keypressed(_, key)
     if key == "x" then
-        local room_manager = require("room_manager")
-        room_manager.switch("overworld", { fromRoom = "portal_interior" })
+        -- Exit back to current universe (no change)
+        room_manager.switch("overworld", {
+            fromRoom = "portal_interior",
+            targetUniverse = nil,
+        })
+    elseif key == "space" then
+        -- Jump to random universe
+        local universes = { "utopian", "neutral", "dystopian" }
+        local randomUniverse = universes[love.math.random(1, #universes)]
+
+        room_manager.switch("overworld", {
+            fromRoom = "portal_interior",
+            targetUniverse = randomUniverse,
+        })
     end
 end
 

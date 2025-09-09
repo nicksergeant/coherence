@@ -305,7 +305,8 @@ After implementation, test it, mark it complete, and update Current Focus sectio
 3. **ALWAYS add logging** for state changes
 4. **NEVER run `love game/` to test** - user has hot reload running
 5. **ALWAYS run `luacheck` after code changes** to catch Lua errors
-6. **Verify code changes** are correct without running the game
-7. **Check Tasks.md** before starting new work
-8. **Update Tasks.md** after completing work
-9. **Reference Examples.md** for implementation patterns
+6. **ALWAYS run `stylua game/` after code changes** to format Lua code consistently
+7. **Verify code changes** are correct without running the game
+8. **Check Tasks.md** before starting new work
+9. **Update Tasks.md** after completing work
+10. **Reference Examples.md** for implementation patterns

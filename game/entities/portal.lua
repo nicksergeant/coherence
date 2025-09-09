@@ -29,7 +29,11 @@ end
 
 function portal.onInteract()
     local room_manager = require("room_manager")
-    room_manager.switch("portal_interior", { fromRoom = "overworld" })
+    local overworld = require("rooms.overworld")
+    room_manager.switch("portal_interior", {
+        fromRoom = "overworld",
+        fromUniverse = overworld.currentUniverse,
+    })
 end
 
 function portal.addToWorld(world)

@@ -1,7 +1,7 @@
 local player = {}
 
-local RUN_SPEED = 250
-local WALK_SPEED = 125
+local WALK_SPEED = 250
+local RUN_SPEED = 500
 
 local BOB_SPEED = 17.5
 local BOB_HEIGHT = 2.5
@@ -22,7 +22,7 @@ player.collisionBox = {
     offsetX = 13,
     offsetY = 56,
 }
-player.speed = RUN_SPEED
+player.speed = WALK_SPEED
 player.direction = "down"
 player.sprites = {}
 player.spriteScale = 2
@@ -62,10 +62,10 @@ end
 
 function player.update(dt, worldWidth, worldHeight)
     -- Movement input and speed
-    local speed = player.speed
+    local speed = WALK_SPEED
     ---@diagnostic disable-next-line: param-type-mismatch
     if love.keyboard.isDown("rshift") or love.keyboard.isDown("lshift") then
-        speed = WALK_SPEED
+        speed = RUN_SPEED
     end
 
     local dx, dy = 0, 0
