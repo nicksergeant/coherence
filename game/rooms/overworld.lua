@@ -503,16 +503,26 @@ function overworld:drawUI()
 
     -- Timer if active (but no universe label)
     if self.timer > 0 then
-        love.graphics.setColor(0, 0, 0, 0.7)
-        love.graphics.rectangle("fill", 10, 10, 100, 30)
-
+        local timerFont = love.graphics.newFont(36)
+        local oldFont = love.graphics.getFont()
+        love.graphics.setFont(timerFont)
+        
+        local timerText = string.format("%.1f", self.timer)
+        local x, y = 20, 20
+        
+        -- Draw shadow
+        love.graphics.setColor(0, 0, 0, 0.8)
+        love.graphics.print(timerText, x + 2, y + 2)
+        
+        -- Draw timer text
         if self.timer < 5 then
             love.graphics.setColor(1, 0.3, 0.3, 1) -- Red when low
         else
-            love.graphics.setColor(1, 1, 1, 1)
+            love.graphics.setColor(1, 1, 1, 1) -- White normally
         end
-
-        love.graphics.print(string.format("%.1f", self.timer), 15, 15)
+        love.graphics.print(timerText, x, y)
+        
+        love.graphics.setFont(oldFont)
     end
 
     -- Directional arrows
